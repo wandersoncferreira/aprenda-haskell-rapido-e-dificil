@@ -5,6 +5,9 @@
   - [[#não-tenha-medo][Não tenha medo]]
   - [[#haskell-muito-básico][Haskell muito básico]]
     - [[#um-exemplo-usando-tipos][Um exemplo usando Tipos]]
+- [[#haskell-básico][Haskell básico]]
+  - [[#notations][Notations]]
+  - [[#useful-notations-for-functions][Useful notations for functions]]
 
 ** Exploda sua cabeça com Haskell
 
@@ -461,3 +464,12 @@ O compilador reclama! *Os dois parâmetros precisam ter o mesmo tipo!*
 Se você acredita que isso é uma má ideia e que o compilador deveria fazer a
 transformação de um tipo para o outro para você, aconselho você a assistir esse
 ótimo (e engraçado) video: [[https://www.destroyallsoftware.com/talks/wat][WAT]]
+
+
+* Haskell básico
+
+[[file:images/_20210725_134647screenshot.png]]
+
+** Notations
+
+** Useful notations for functions
