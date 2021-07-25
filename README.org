@@ -73,7 +73,16 @@ runhaskell filename.lhs
 
 * Introdução
 ** Instalação
+
+[[file:images/_20210725_105352screenshot.png]]
+
 ** Não tenha medo
+
+[[file:images/_20210725_105402screenshot.png]]
+
 ** Haskell muito básico
+
+[[file:images/_20210725_105419screenshot.png]]
+
 *** Declaração de Funções
 *** Um exemplo usando Tipos
