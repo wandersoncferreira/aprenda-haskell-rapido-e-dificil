@@ -180,5 +180,55 @@ mais comuns.
 
 [[file:images/_20210725_105419screenshot.png]]
 
+Antes de continuar, você precisa ser avisado sobre algumas propriedades
+essenciais do Haskell.
+
+
+**Funcional**
+
+Haskell é uma linguagem funcional. Se você vem tem experiência com linguagens
+imperativas, você vai precisar aprender um monte de coisas novas. Felizmente,
+muitos desses novos conceitos vão te ajudar a programar até nas linguagens
+imperativas.
+
+
+**Tipagem Estática Inteligente**
+
+No lugar de te atrapalhar como no caso de =C=, =C++=, ou =Java=, o sistema de
+tipos do Haskell tenta o máximo possível te ajudar.
+
+
+**Pureza**
+
+Geralmente suas funções não vão modificar nada fora seu ambiente de execução.
+Isso significa que essas funções não podem modificar valores de variáveis, não
+podem pegar valores de entrada de usuários, não podem escrever na sua tela, não
+podem lançar misseis. Por outro lado, paralelismo vai ser bem fácil de alcançar.
+Haskell deixa muito claro onde os *efeitos* podem ocorrer e onde o seu código é
+puro. Dessa forma, vai ser bem mais fácil de racionalizar sobre o seu programa e
+a maioria dos bugs vai ser prevenido nas partes puras do seu programa.
+
+Além disso, funções puras seguem uma lei fundamental em Haskell:
+
+#+begin_quote
+Aplicar uma função com os mesmos parâmetros vai sempre retornar o mesmo resultado
+#+end_quote
+
+
+**Laziness**
+
+*Laziness* (preguiça) ser o comportamento padrão é bastante incomum em
+linguagens de programação. Por padrão, Haskell só vai calcular algo quando for
+necessário. Por consequência disso, Haskell também prove uma forma elegante de
+manipular estruturas infinitas, por exemplo.
+
+Um ultimo aviso sobre como você deveria ler um código Haskell. Para mim, a
+leitura é como se fosse um artigo cientifico. Algumas partes são claras, mas
+quando você encontra uma formula, só foque e leia mais devagar. Além disso,
+enquanto aprende Haskell, realmente não importa se você não entendeu os detalhes
+da sintaxe. Por exemplo, caso encontre um =>>\==, =<$>=, =<-= ou qualquer outro
+simbolo esquisito, só ignore eles e continue seguindo o fluxo de execução do
+código
+
 *** Declaração de Funções
 *** Um exemplo usando Tipos
