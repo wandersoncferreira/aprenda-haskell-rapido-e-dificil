@@ -1,13 +1,12 @@
-* Aprenda Haskell Rápido e Dificil :TOC_3_gh:
-  - [[#exploda-sua-cabeça-com-haskel][Exploda sua cabeça com Haskel]]
+* Aprenda Haskell Rápido e Difícil :TOC_3_gh:
+  - [[#exploda-sua-cabeça-com-haskell][Exploda sua cabeça com Haskell]]
 - [[#introdução][Introdução]]
   - [[#instalação][Instalação]]
   - [[#não-tenha-medo][Não tenha medo]]
   - [[#haskell-muito-básico][Haskell muito básico]]
-    - [[#declaração-de-funções][Declaração de Funções]]
     - [[#um-exemplo-usando-tipos][Um exemplo usando Tipos]]
 
-** Exploda sua cabeça com Haskel
+** Exploda sua cabeça com Haskell
 
 [[file:images/_20210725_102116screenshot.png]]
 
@@ -38,7 +37,7 @@ para aprender Haskell. É difícil e desafiador, mas eu acredito que isso é uma
 coisa boa.
 
 O método convencional para aprender Haskell se resume em ler dois livros.
-Primeiro, "[[http://learnyouahaskell.com/][Learn You a Haskell]]"and depois "[[http://book.realworldhaskell.org][Real World Haskell]]". Eu acredito que
+Primeiro, "[[http://learnyouahaskell.com/][Learn You a Haskell]]" e depois "[[http://book.realworldhaskell.org][Real World Haskell]]". Eu acredito que
 essa é a melhor forma de fato, mas para aprender do que se trata Haskell de
 verdade, você precisa ler esses livros nos detalhes.
 
@@ -230,5 +229,153 @@ da sintaxe. Por exemplo, caso encontre um =>>==, =<$>=, =<-= ou qualquer outro
 simbolo esquisito, só ignore eles e continue seguindo o fluxo de execução do
 código
 
-*** Declaração de Funções
+*** COMMENT Declaração de Funções
+
+Você pode estar acostumado a declarar funções dessa forma:
+
+In C:
+#+begin_src c
+int f(int x, int y) {
+    return x*x + y*y;
+}
+#+end_src
+
+In JavaScript:
+#+begin_src javascript
+function f(x,y) {
+    return x*x + y*y;
+}
+#+end_src
+
+In Python:
+#+begin_src python
+def f(x,y):
+    return x*x + y*y
+#+end_src
+
+In Ruby:
+#+begin_src ruby
+def f(x,y)
+  x*x + y*y
+end
+#+end_src
+
+In Scheme:
+#+begin_src scheme
+(define (f x y)
+  (+ (* x x) (* y y)))
+#+end_src
+
+Finalmente, em Haskell:
+#+begin_src haskell
+f x y = x**x + y*y
+#+end_src
+
+Bem limpo. Sem parenteses, sem =def=.
+
+Não se esqueça que Haskell usa muito funções e tipos, dessa forma é bem simples
+definir esses elementos. A sintaxe foi particularmente escolhida para esses
+objetos.
+
+
 *** Um exemplo usando Tipos
+
+Embora não seja obrigatório, a informação sobre o tipo para as funções é
+geralmente feita explicitamente. Não é obrigatório porque o compilador é esperto
+o suficiente para descobrir esses tipos para você. Porém, é uma boa ideia
+declarar os tipos explicitamente porque indica qual era a sua intenção quando
+escreveu o programa e melhora o entendimento de quem for ler o código.
+
+Vamos experimentar um pouco. A declaração de um tipo se faz usando =::=
+
+#+begin_src haskell
+f :: Int -> Int -> Int
+f x y = x*x + y*y
+
+main = print (f 2 3)
+#+end_src
+
+#+begin_src shell
+~ runhaskell arquivo_com_codigo_acima_salvo.lhs
+13
+#+end_src
+
+
+--------
+
+Agora tente:
+
+#+begin_src haskell
+f :: Int -> Int -> Int
+f x y = x*x + y*y
+
+main = print (f 2.3 4.2)
+#+end_src
+
+Você deve receber esse erro:
+
+#+begin_src shell
+arquivo_com_codigo_acima_salvo.lhs:6:23:
+    No instance for (Fractional Int)
+      arising from the literal `4.2'
+    Possible fix: add an instance declaration for (Fractional Int)
+    In the second argument of `f', namely `4.2'
+    In the first argument of `print', namely `(f 2.3 4.2)'
+    In the expression: print (f 2.3 4.2)
+#+end_src
+
+O problema: =4.2= não é um =Int=.
+
+--------
+
+A solução: não declare o tipo para a função =f= por enquanto e deixe o Haskell
+inferir o tipo mais genérico que ele conseguir para nós:
+
+#+begin_src haskell
+f x y = x*x + y*y
+
+main = print (f 2.3 4.2)
+#+end_src
+
+Funcionou! Felizmente, não precisamos declarar uma nova função para cada tipo de
+dado diferente que queremos suportar. Por exemplo, em =C= você teria que
+declarar uma função que aceita =Int=, uma para =float=, uma para =long=, uma
+para =double=, etc.
+
+Mas quais tipos devemos declarar? Para descobrir o tipo que o Haskell encontrou
+para nós, vamos utilizar o =ghci= (REPL):
+
+#+begin_src shell
+% ghci
+GHCi, version 7.0.4: http://www.haskell.org/ghc/  :? for help
+Loading package ghc-prim ... linking ... done.
+Loading package integer-gmp ... linking ... done.
+Loading package base ... linking ... done.
+Loading package ffi-1.0 ... linking ... done.
+Prelude> let f x y = x*x + y*y
+Prelude> :type f
+f :: Num a => a -> a -> a
+#+end_src
+
+Uhm? Que tipo é esse?
+
+#+begin_src haskell
+Num a => a -> a -> a
+#+end_src
+
+Primeiro, vamos focar na parte da direita =a -> a -> a=. Para entender isso,
+vamos analisar esses exemplos:
+
+| Tipo           | Significado                                                            |
+|----------------+------------------------------------------------------------------------|
+| =Int=          | o tipo =Int=                                                           |
+| =Int -> Int=   | uma função tipada que mapeia de =Int= para =Int=                       |
+| =Float -> Int= | uma função tipada que mapeia de =Float= para =Int=                     |
+| =a -> Int=     | uma função tipada que mapeia qualquer tipo para =Int=                  |
+| =a -> a=       | uma função tipada que mapeia qualquer tipo =a= para o mesmo tipo =a=   |
+| =a -> a -> a=  | uma função tipada de dois argumentos de tipo =a= para o mesmo tipo =a= |
+
+No tipo =a -> a -> a=, a letra =a= é uma =variável de tipo=. Isso significa que
+=f= é uma função com dois argumentos e ambos os argumentos e o resultado tem o
+mesmo tipo. A variável de tipo =a= pode assumir vários valores de tipos
+diferentes, por exemplo, =Int=, =Integer=, =Float=, etc.
