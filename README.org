@@ -184,7 +184,7 @@ Antes de continuar, você precisa ser avisado sobre algumas propriedades
 essenciais do Haskell.
 
 
-**Funcional**
+*Funcional*
 
 Haskell é uma linguagem funcional. Se você vem tem experiência com linguagens
 imperativas, você vai precisar aprender um monte de coisas novas. Felizmente,
@@ -192,13 +192,13 @@ muitos desses novos conceitos vão te ajudar a programar até nas linguagens
 imperativas.
 
 
-**Tipagem Estática Inteligente**
+*Tipagem Estática Inteligente*
 
 No lugar de te atrapalhar como no caso de =C=, =C++=, ou =Java=, o sistema de
 tipos do Haskell tenta o máximo possível te ajudar.
 
 
-**Pureza**
+*Pureza*
 
 Geralmente suas funções não vão modificar nada fora seu ambiente de execução.
 Isso significa que essas funções não podem modificar valores de variáveis, não
@@ -215,7 +215,7 @@ Aplicar uma função com os mesmos parâmetros vai sempre retornar o mesmo resul
 #+end_quote
 
 
-**Laziness**
+*Laziness*
 
 *Laziness* (preguiça) ser o comportamento padrão é bastante incomum em
 linguagens de programação. Por padrão, Haskell só vai calcular algo quando for
@@ -226,7 +226,7 @@ Um ultimo aviso sobre como você deveria ler um código Haskell. Para mim, a
 leitura é como se fosse um artigo cientifico. Algumas partes são claras, mas
 quando você encontra uma formula, só foque e leia mais devagar. Além disso,
 enquanto aprende Haskell, realmente não importa se você não entendeu os detalhes
-da sintaxe. Por exemplo, caso encontre um =>>\==, =<$>=, =<-= ou qualquer outro
+da sintaxe. Por exemplo, caso encontre um =>>==, =<$>=, =<-= ou qualquer outro
 simbolo esquisito, só ignore eles e continue seguindo o fluxo de execução do
 código
 
