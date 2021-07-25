@@ -61,13 +61,14 @@ O artigo contém 5 partes:
 5. Anexo
    a. Mais sobre arvores infinitas: uma discussão mais orientada usando matemática
 
-
-> Nota: Toda vez que você encontrar um separador com um arquivo terminando em
+#+begin_quote
+ Nota: Toda vez que você encontrar um separador com um arquivo terminando em
   =.lhs= você pode clicar no nome do arquivo e fazer o download. Se você salvar
   o arquivo como =filename.lhs=, você pode rodar ele com:
   #+begin_src shell
 runhaskell filename.lhs
   #+end_src
+#+end_quote
 
 
 * Introdução
