@@ -88,7 +88,7 @@ Ferramentas:
   é bem mais lento do que executar o programa compilado.
 
 #+begin_quote
-**Nota{Wand}**: Caso você use o Emacs, recomendo o [[https://github.com/hlissner/doom-emacs][Doom]] emacs e basta habilitar
+Nota{Wand}: Caso você use o Emacs, recomendo o [[https://github.com/hlissner/doom-emacs][Doom]] emacs e basta habilitar
   a camada de Haskell +lsp.
 #+end_quote
 
