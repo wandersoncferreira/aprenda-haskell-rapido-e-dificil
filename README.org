@@ -3,4 +3,4 @@
 
 ** Exploda sua cabeça com Haskel
 
-[[download:_20210725_102116screenshot.png]]
+[[file:images/_20210725_102116screenshot.png]]
