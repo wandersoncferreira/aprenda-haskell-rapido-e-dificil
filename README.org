@@ -1,6 +1,78 @@
 * Aprenda Haskell Rápido e Dificil :TOC_3_gh:
   - [[#exploda-sua-cabeça-com-haskel][Exploda sua cabeça com Haskel]]
+- [[#introdução][Introdução]]
+  - [[#instalação][Instalação]]
+  - [[#não-tenha-medo][Não tenha medo]]
+  - [[#haskell-muito-básico][Haskell muito básico]]
+    - [[#declaração-de-funções][Declaração de Funções]]
+    - [[#um-exemplo-usando-tipos][Um exemplo usando Tipos]]
 
 ** Exploda sua cabeça com Haskel
 
 [[file:images/_20210725_102116screenshot.png]]
+
+Um tutorial pequeno e denso para aprender Haskell.
+
+Eu realmente acredito que todos os desenvolvedores deveriam aprender Haskell. Eu
+não acho que todo mundo precisa ser super Haskell ninjas, mas que pelo menos
+pudessem descobrir o que o Haskell tem para oferecer.
+
+Aprender Haskell abre sua mente.
+
+As linguagens de programação mais utilizadas compartilham as mesmas fundações:
+
+- variáveis
+- _loops_
+- ponteiros
+- estruturas de dados, objetos e classes
+
+Haskell é bem diferente. A linguagem usa vários conceitos que eu nunca tinha
+ouvido falar antes. Muitos desses conceitos vão ajudar você a se tornar um
+programador melhor.
+
+Mas aprender Haskell pode ser bem difícil. Foi assim pra mim. Nesse artigo eu
+tento passar o que faltou pra mim enquanto eu aprendia Haskell.
+
+Esse artigo vai ser difícil de ser seguido. Isso é proposital. Não há atalhos
+para aprender Haskell. É difícil e desafiador, mas eu acredito que isso é uma
+coisa boa.
+
+O método convencional para aprender Haskell se resume em ler dois livros.
+Primeiro, "[[http://learnyouahaskell.com/][Learn You a Haskell]]"and depois "[[http://book.realworldhaskell.org][Real World Haskell]]". Eu acredito que
+essa é a melhor forma de fato, mas para aprender do que se trata Haskell de
+verdade, você precisa ler esses livros nos detalhes.
+
+Em contrapartida, esse artigo é uma visão geral bem resumida e densa de todas os
+aspectos gerais de Haskell. Eu também adicionei algumas informações que eu não
+tinha quando eu aprendi Haskell.
+
+O artigo contém 5 partes:
+
+1. Introdução: breve exemplo para mostrar que Haskell pode ser amigável
+2. Haskell básico: sintaxe e algumas noções essenciais
+3. Nível de dificuldade - *HARD*:
+   a. Estilo funcional: um exemplo progressivo do estilo imperativo para o funcional
+   b. Tipos: tipos e exemplo de uma arvore binaria
+   c. Sequencias infinitas: manipular uma arvore binaria infinita
+4. Nível de dificuldade - *HELL*
+   a. Lidando com IO: um pequeno exemplo
+   b. Explicando truques envolvendo IO: os detalhes escondidos para entender IO
+   c. _Monads_: generalizações incríveis
+5. Anexo
+   a. Mais sobre arvores infinitas: uma discussão mais orientada usando matemática
+
+
+> Nota: Toda vez que você encontrar um separador com um arquivo terminando em
+  =.lhs= você pode clicar no nome do arquivo e fazer o download. Se você salvar
+  o arquivo como =filename.lhs=, você pode rodar ele com:
+  #+begin_src shell
+runhaskell filename.lhs
+  #+end_src
+
+
+* Introdução
+** Instalação
+** Não tenha medo
+** Haskell muito básico
+*** Declaração de Funções
+*** Um exemplo usando Tipos
