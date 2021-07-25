@@ -76,6 +76,23 @@ runhaskell filename.lhs
 
 [[file:images/_20210725_105352screenshot.png]]
 
+Existem diferentes formas para instalar o Haskell, eu recomendo utilizar o
+[[https://docs.haskellstack.org/en/stable/README/][stack]]. As outras formas de instalar Haskell vão depender bastante do seu
+sistema, você pode aprender mais sobre isso visitando [[https://www.haskell.org][haskell.org]] ou
+[[https://www.fpcomplete.com/haskell/][haskell-lang.org]].
+
+Ferramentas:
+- =ghc=: Compilador similar ao gcc para =C=
+- =ghci=: Haskell Interativo (REPL)
+- =runhaskell=: Execute um programa sem compilar ele. Bastante conveniente, mas
+  é bem mais lento do que executar o programa compilado.
+
+#+begin_quote
+**Nota{Wand}**: Caso você use o Emacs, recomendo o [[https://github.com/hlissner/doom-emacs][Doom]] emacs e basta habilitar
+  a camada de Haskell +lsp.
+#+end_quote
+
+
 ** Não tenha medo
 
 [[file:images/_20210725_105402screenshot.png]]
