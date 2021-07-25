@@ -97,6 +97,85 @@ Nota{Wand}: Caso você use o Emacs, recomendo o [[https://github.com/hlissner/do
 
 [[file:images/_20210725_105402screenshot.png]]
 
+Muitos livros e artigos sobre Haskell iniciam com alguma formula esotérica
+(quicksort, Fibonacci, etc). Eu vou pelo extremo oposto. De inicio não vou te
+mostrar nenhum super poder do Haskell. Eu vou iniciar com as similaridades entre
+Haskell e outras linguagens de programação. Vamos começar com o obrigatório
+"Hello World".
+
+#+begin_src haskell
+main = putStrLn "Hello World!"
+#+end_src
+
+Para rodar, você precisa salvar esse código em um arquivo =hello.hs= e:
+
+#+begin_src shell
+~ runhaskell ./hello.hs
+Hello World!
+#+end_src
+
+ou se você estiver usando =stack=, primeiro rode =stack setup= e depois:
+
+#+begin_src shell
+~ stack runhaskell ./hello.hs
+Hello World!
+#+end_src
+
+-------
+
+Agora vamos criar um programa perguntando pelo seu nome e respondendo "Hello"
+usando o nome que você forneceu:
+
+#+begin_src haskell
+main = do
+  print "What is your name?"
+  name <- getLine
+  print ("Hello " ++ name ++ "!")
+#+end_src
+
+Vamos comparar como esse programa seria implementado em algumas linguagens
+imperativas:
+
+#+begin_src python
+# Python
+
+print "What is your name?"
+name = raw_input()
+print "Hello %s!" % name
+#+end_src
+
+#+begin_src ruby
+# Ruby
+
+puts "What is your name?"
+name = gets.chomp
+puts "Hello #{name}!"
+#+end_src
+
+#+begin_src c
+// In C
+
+#include <stdio.h>
+int main (int argc, char **argv) {
+    char name[666]; // <- An Evil Number!
+    // What if my name is more than 665 character long?
+    printf("What is your name?\n");
+    scanf("%s", name);
+    printf("Hello %s!\n", name);
+    return 0;
+}
+#+end_src
+
+A estrutura é a mesma, mas existem algumas diferenças de sintaxe. A principal
+parte desse tutorial vai ser dedicada a explicar o por quê.
+
+Em Haskell existe a função =main= e todos os objetos tem um =tipo=. O tipo da
+função =main= é =IO()=. Isso significa que =main= vai causar algum efeito
+colateral.
+
+Lembre-se que Haskell pode se parecer bastante com linguagens de programação
+mais comuns.
+
 ** Haskell muito básico
 
 [[file:images/_20210725_105419screenshot.png]]
