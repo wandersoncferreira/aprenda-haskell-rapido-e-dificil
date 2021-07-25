@@ -379,3 +379,94 @@ No tipo =a -> a -> a=, a letra =a= é uma =variável de tipo=. Isso significa qu
 =f= é uma função com dois argumentos e ambos os argumentos e o resultado tem o
 mesmo tipo. A variável de tipo =a= pode assumir vários valores de tipos
 diferentes, por exemplo, =Int=, =Integer=, =Float=, etc.
+
+Ou seja, no lugar de ter tipos forçados como em =C= e precisar declarar funções
+para =Int=, =long=, =float=, =double=, etc, nós declaramos apenas uma função
+similar ao que acontece em linguagens dinamicamente tipadas.
+
+Esse comportamento é chamado de polimorfismo paramétrico.
+
+Geralmente =a= pode ser qualquer tipo, por exemplo uma =String= ou um =Int=, mas
+também pode ser tipos mais complexos como =Trees= ou outras funções.
+
+Mas nesse caso não vamos esquecer que o nosso tipo está prefixado com =Num a
+=>=. =Num= é uma *classe de tipos*, uma classe de tipos pode ser entendida como
+um conjunto de tipos. =Num= contem tipos que se comportam como números mais
+precisamente, =Num= é o conjunto de tipos que implementam as funções =(+)= e
+=(*)=.
+
+Classes de tipos são recursos da linguagem muito poderosos. Nós podemos fazer
+coisas bem poderosas com isso, mais sobre isso depois.
+
+Finalmente, =Num a => a -> a -> a= significa:
+
+Seja =a= um tipo que pertence ao conjunto de tipos =Num=. Essa é uma função do
+tipo =a= para =a -> a=.
+
+Sim, esquisito. De fato, em Haskell nenhuma função tem dois argumentos na
+realidade. Todas as funções tem apenas um argumento, mas podemos notar que
+receber dois argumentos é equivalente a receber apenas um e retornar uma função
+que recebe o segundo.
+
+Mais precisamento =f 3 4= é equivalente a =(f 3) 4=. Note que =f 3= é a função:
+
+#+begin_src haskell
+f :: Num a => a -> a -> a
+g :: Num a => a -> a
+g = f 3
+
+g y <=> 3*3 + y*y
+#+end_src
+
+Podemos usar uma outra notação para funções. A notação lambda permite criar
+funções sem definir um nome para elas, ou seja, criamos funções anonimas. Assim,
+podiamos ter escrito:
+
+#+begin_src haskell
+g = \y -> 3*3 + y*y
+#+end_src
+
+O =\= é usado porque se parece com =λ= em ASCII.
+
+Se você não está acostumado com programação funcional o seu cérebro deve estar
+começando a esquentar. Agora é hora de criar uma aplicação de verdade.
+
+-------
+
+Mas antes disso, nós deveriamos verificar que o sistema de tipos do Haskell está
+funcionando como o esperado:
+
+#+begin_src haskell
+f :: Num a => a -> a -> a
+f x y = x*x + y*y
+
+main = print (f 3 2.4)
+#+end_src
+
+Funciona porque =3= é uma representação válida para ambos números Fracionados
+como =Float= quanto para =Integer=.
+
+--------
+
+Se forçarmos a nossa função para funcionar com tipos de dados diferentes, ela
+vai falhar:
+
+#+begin_src haskell
+f :: Num a => a -> a -> a
+f x y = x*x + y*y
+
+x :: Int
+x = 3
+
+y :: Float
+y = 2.4
+
+-- não funciona porque o tipo de x é diferente do tipo de y
+main = print (f x y)
+#+end_src
+
+O compilador reclama! *Os dois parâmetros precisam ter o mesmo tipo!*
+
+Se você acredita que isso é uma má ideia e que o compilador deveria fazer a
+transformação de um tipo para o outro para você, aconselho você a assistir esse
+ótimo (e engraçado) video: [[https://www.destroyallsoftware.com/talks/wat][WAT]]
