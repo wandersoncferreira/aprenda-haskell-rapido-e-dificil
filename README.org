@@ -1,9 +1,6 @@
 * Aprenda Haskell Rápido e Dificil :TOC_3_gh:
   - [[#exploda-sua-cabeça-com-haskel][Exploda sua cabeça com Haskel]]
 
-** Exploda sua cabeça com Haskel :ATTACH:
-:PROPERTIES:
-:ID:       7b22a717-62b5-4437-adc9-91460842d28d
-:END:
+** Exploda sua cabeça com Haskel
 
-[[attachment:_20210725_100521screenshot.png]]
+[[download:_20210725_102116screenshot.png]]
