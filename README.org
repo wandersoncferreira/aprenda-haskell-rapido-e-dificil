@@ -669,12 +669,265 @@ A parte difícil pode começar agora.
 
 ** Estilo funcional
 
-
 [[file:images/_20210725_195209screenshot.png]]
 
+Nessa seção, eu vou dar um pequeno exemplo do poder impressionante de
+refatoração de código que o Haskell provê. Nós vamos selecionar um problema e
+resolvê-lo utilizando um estilo imperativo convencional, depois eu vou evoluir o
+código até chegarmos na versão funcional.
+
+A versão final vai ser ao mesmo tempo mais elegante e mais fácil de se adaptar.
+
+Vamos resolver o seguinte problema:
+
+#+begin_quote
+Dada uma lista de inteiros, retorne a soma dos números pares dessa lista.
+Exemplo: =[1,2,3,4,5] ⇒ 2 + 4 ⇒ 6
+#+end_quote
+
+
+Para demonstrar as diferenças entre os estilos imperativo e funcional, eu vou
+iniciar com uma implementação imperativa em JavaScript:
+
+#+begin_src javascript
+function evenSum(list) {
+    var result = 0;
+    for (var i=0; list.length; i++) {
+        if (list[i] % 2 == 0) {
+            result += list[i];
+        }
+    }
+    return result;
+}
+#+end_src
+
+Em Haskell, por outro lado, nós não temos variáveis ou um =for loop=. Uma
+solução para alcançar o mesmo resultado sem utilizar =loops= é através da
+recursão.
+
+#+begin_quote
+Observação: Recursão é geralmente entendida como algo *lento* em linguagens
+imperativas, porém geralmente isso não é verdade em linguagens functionais. A
+maioria das vezes o Haskell vai tratar a recursão de funções de forma eficiente.
+#+end_quote
+
+Aqui temos uma versão em C utilizando funções recursivas. Note que para
+simplificar, eu assumi que a lista de inteiros vai acabar quando encontrar o
+primeiro valor 0 dentro da lista.
+
+#+begin_src c
+int evenSum(int *list) {
+    return accumSum(0, list);
+}
+
+int accumSum(int n, int *list) {
+    int x;
+    int *xs;
+    if (*list == 0) { // se a lista está vazia
+        return n;
+    } else {
+        x = list[0];
+        xs = list + 1;
+        if (0 == (x%2)) { // se x é par
+            return accumSum(n+x, xs);
+        } else {
+            return accumSum(n, xs);
+        }
+    }
+}
+#+end_src
+
+
+Mantenha esse código na cabeça. Nós vamos traduzi-lo para Haskell. Primeiro,
+entretanto, eu preciso introduzir três funcões simples mas muito uteis que nós
+vamos usar:
+
+#+begin_src haskell
+even :: Integral a => a -> Bool
+head :: [a] -> a
+tail :: [a] -> [a]
+#+end_src
+
+=even= verifica se um número é par.
+#+begin_src haskell
+even :: Integral a => a -> Bool
+even 3 ⇒ False
+even 2 ⇒ True
+#+end_src
+
+=head= retorna o primeiro elemento de uma lista.
+#+begin_src haskell
+head :: [a] -> a
+head [1,2,3] ⇒ 1
+head [] ⇒ ERROR
+#+end_src
+
+=tail= retorna todos os elementos da lista, exceto o primeiro.
+#+begin_src haskell
+tail :: [a] -> [a]
+tail [1,2,3]  ⇒ [2,3]
+tail [3]      ⇒ []
+tail []       ⇒ ERROR
+#+end_src
+
+Note que para qualquer lista não vazia, =l ⇔ (head l):(tail l)=
+
+-------
+
+A primeira solução para o problema proposto em Haskell. A função =evenSum=
+retorna a soma de todos os números pares em uma lista:
+
+#+begin_src haskell
+-- Version 1
+evenSum :: [Integer] -> Integer
+
+evenSum l = accumSum 0 l
+accumSum n l = if l == []
+               then n
+               else let x = head l
+                        xs = tail l
+                    in if even x
+                          then accumSum (n+x) xs
+                       else accumSum n xs
+#+end_src
+
+Para testar a função você pode utilizar o =ghci=:
+
+#+begin_src shell
+% ghci
+GHCi, version 7.0.3: http://www.haskell.org/ghc/  :? for help
+Loading package ghc-prim ... linking ... done.
+Loading package integer-gmp ... linking ... done.
+Loading package base ... linking ... done.
+Prelude> :load 11_Functions.lhs
+[1 of 1] Compiling Main             ( 11_Functions.lhs, interpreted )
+Ok, modules loaded: Main.
+,*Main> evenSum [1..5]
+6
+#+end_src
+
+Segue o exemplo do fluxo de execução da chamada em Haskell:
+#+begin_src shell
+,*Main> evenSum [1..5]
+accumSum 0 [1,2,3,4,5]
+1 is odd
+accumSum 0 [2,3,4,5]
+2 is even
+accumSum (0+2) [3,4,5]
+3 is odd
+accumSum (0+2) [4,5]
+2 is even
+accumSum (0+2+4) [5]
+5 is odd
+accumSum (0+2+4) []
+l == []
+0+2+4
+0+6
+6
+#+end_src
+
+Mesmo vindo de uma experiência com linguagens imperativas tudo deve parecer
+tranquilo. De fato, muitas coisas podem ser melhoradas nessa primeira
+implementação. Primeiro, podemos generalizar os tipos.
+
+#+begin_src haskell
+evenSum :: Integral a => [a] -> a
+#+end_src
+
+
+-------
+
+Depois, nós podemos utilizar a função =where= ou =let= e assim a função
+=accumSum= não precisa poluir o nosso modulo.
+
+#+begin_src haskell
+-- Versao 2
+evenSum :: Integral a => [a] -> a
+evenSum l = accumSum 0 l
+  where accumSum n l =
+          if l == []
+          then n
+          else let x = head l
+                   xs = tail l
+                   in if even x
+                      then accumSum (n+x) xs
+                      else accumSum n xs
+#+end_src
+
+Depois, nós podemos utilizar =pattern matching=.
+
+#+begin_src haskell
+-- Versao 3
+evenSum l = accumSum 0 l
+  where
+    accumSum n [] = n
+    accumSum n (x:xs) =
+      if even x
+      then accumSum (n+x) xs
+      else accumSum n xs
+#+end_src
+
+O que é =pattern matching=? Nós estamos usando *valores* no lugar dos nomes dos
+parâmetros para fazer escolha do =branch= de execução.
+
+No lugar de falar: =foo l = if l == [] then <x> else <y>=, você pode
+simplesmente dizer:
+
+#+begin_src haskell
+foo [] = <x>
+foo l = <y>
+#+end_src
+
+Mas =pattern matching= pode ir muito além, pois também é possível inspecionar a
+estrutura interna dos dados. Podemos substituir:
+
+#+begin_src haskell
+foo l = let x = head l
+            xs = tail l
+            in if even x
+               then foo (n+x) xs
+               else foo n xs
+#+end_src
+
+por
+
+#+begin_src haskell
+foo (x:xs) = if even x
+             then foo (n+x) xs
+             else foo n xs
+#+end_src
+
+Essa é uma funcionalidade muito útil porque deixa o nosso código mais enxuto e
+fácil de ler.
+
+------
+
+Em Haskell você pode simplificar a definição de uma função através da técnica de
+=η-redução=. Por exemplo, no lugar de escrever:
+
+#+begin_src haskell
+f x = (alguma expressao) x
+#+end_src
+
+Você pode simplesmente escrever
+#+begin_src haskell
+f = alguma expressao
+#+end_src
+
+Usando esse método, nós podemos remover o =l= da implementação 3.
+#+begin_src haskell
+-- versao 4
+evenSum :: Integral a => [a] -> a
+evenSum = accumSum 0
+  where
+    accumSum n [] = n
+    accumSum n (x:xs) =
+      if even x
+      then accumSum (n+x) xs
+      else accumSum n xs
+#+end_src
 
 ** Funções de ordem elevadas
-
 
 [[file:images/_20210725_195232screenshot.png]]
 
