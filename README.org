@@ -15,7 +15,6 @@
     - [[#inferência-de-tipos][Inferência de tipos]]
     - [[#construção-de-tipos][Construção de tipos]]
     - [[#tipos-recursivos][Tipos recursivos]]
-    - [[#arvores][Arvores]]
     - [[#estruturas-infinitas][Estruturas infinitas]]
 - [[#nível-de-dificuldade---hell][Nível de dificuldade - HELL]]
   - [[#lidando-com-io][Lidando com IO]]
@@ -1356,7 +1355,275 @@ img z ⇒ 4
 
 *** Tipos recursivos
 
-*** Arvores
+Você já encontrou um tipo recursivo: listas. Você pode recriar listas, mas
+usando uma sintaxe mais prolixa.
+
+#+begin_src haskell
+data List a = Empty | Cons a (List a)
+#+end_src
+
+Se você quer ser capaz de mostrar (=Show=), ler (=Read=), testar igualdade
+(=Eq=), e fazer comparações (=Ord=) com sua nova estrutura de dados, você pode
+avisar o Haskell para derivar as funções apropriadas para você:
+
+#+begin_src haskell
+infixr 5 :::
+data List a = Nil | a ::: (List a)
+  deriving (Show, Read, Eq, Ord)
+#+end_src
+
+Quando você adiciona =deriving (Show)= para a sua estrutura de dados, Haskell
+cria a função =show= para você. Embreve nós vamos utilizar essa função e você
+verá como utilizá-la.
+
+*** COMMENT Arvores
+
+[[file:images/_20210726_160704screenshot.png]]
+
+
+Vamos explorar outro exemplo padrão: arvores binárias.
+
+#+begin_src haskell
+import Data.List
+data BinTree a = Empty
+  | Node a (BinTree a) (BinTree a) deriving (Show)
+#+end_src
+
+
+Vamos criar uma função que transforma uma lista em uma arvore binaria ordenada.
+
+#+begin_src haskell
+treeFromList :: (Ord a) => [a] -> BinTree a
+treeFromList [] = Empty
+treeFromList (x:xs) = Node x
+  (treeFromList (filter (<x) xs))
+  (treeFromList (filter (>x) xs))
+
+#+end_src
+
+Veja o quão elegante é essa função:
+
+- uma lista vazia vai ser convertida em uma arvore vazia
+- a lista =(x:xs)= vai ser convertida em uma arvore onde:
+  + a raiz é =x=
+  + a arvore há esquerda é criada por elementos da lista que são estritamente inferior a =x=
+  + a arvore há direita é criada por elementos da lista que são estritamente superior a =x=
+
+
+#+begin_src haskell
+main = print $ treeFromList [7,2,4,8]
+#+end_src
+
+Você deve obter o seguinte:
+
+#+begin_src haskell
+Node 7 (Node 2 Empty (Node 4 Empty Empty)) (Node 8 Empty Empty)
+#+end_src
+
+Essa é uma representação útil, mas não muito agradável de uma arvore.
+
+
+------
+
+Só por diversão, vamos programar uma versão melhor para mostrar arvores. Eu me
+diverti bastante fazendo uma função interessante para mostrar arvores de uma
+forma geral. Você pode pular essa parte se você achar muito difícil de seguir.
+
+Nós temos que fazer algumas poucas mudanças. Vamos remover o =deriving (Show)=
+da declaração do nosso tipo =BinTree=. E vai ser útil tornar a nossa BinTree uma
+instancia de (=Eq= e =Ord=) para que possamos testar igualdades e comparar
+arvores.
+
+#+begin_src haskell
+data BinTree a = Empty
+  | Node a (BinTree a) (BinTree a)
+  deriving (Eq, Ord)
+#+end_src
+
+Sem =deriving (Show)=, Haskell não vai criar a função =show= para nós. Nós vamos
+criar nossa própria versão de =show=. Para alcançar isso, nós precisamos
+declarar que nosso tipo =BinTree= é uma instancia da classe =Show=. A sintax é:
+
+#+begin_src haskell
+instance Show (BinTree a) where
+  show t = ...  --- Você pode declarar a sua função aqui
+#+end_src
+
+Essa é a minha versão sobre como mostrar arvores binarias. Não se preocupe com a
+complexidade aparente, eu fiz várias melhorias para conseguir mostrar até
+objetos bem estranhos.
+
+#+begin_src haskell
+-- declare BinTree a to be an instance of Show
+instance (Show a) => Show (BinTree a) where
+  -- will start by a '<' before the root
+  -- and put a : a begining of line
+  show t = "< " ++ replace '\n' "\n: " (treeshow "" t)
+    where
+    -- treeshow pref Tree
+    --   shows a tree and starts each line with pref
+    -- We don't display the Empty tree
+    treeshow pref Empty = ""
+    -- Leaf
+    treeshow pref (Node x Empty Empty) =
+                  (pshow pref x)
+
+    -- Right branch is empty
+    treeshow pref (Node x left Empty) =
+                  (pshow pref x) ++ "\n" ++
+                  (showSon pref "`--" "   " left)
+
+    -- Left branch is empty
+    treeshow pref (Node x Empty right) =
+                  (pshow pref x) ++ "\n" ++
+                  (showSon pref "`--" "   " right)
+
+    -- Tree with left and right children non empty
+    treeshow pref (Node x left right) =
+                  (pshow pref x) ++ "\n" ++
+                  (showSon pref "|--" "|  " left) ++ "\n" ++
+                  (showSon pref "`--" "   " right)
+
+    -- shows a tree using some prefixes to make it nice
+    showSon pref before next t =
+                  pref ++ before ++ treeshow (pref ++ next) t
+
+    -- pshow replaces "\n" by "\n"++pref
+    pshow pref x = replace '\n' ("\n"++pref) (show x)
+
+    -- replaces one char by another string
+    replace c new string =
+      concatMap (change c new) string
+      where
+          change c new x
+              | x == c = new
+              | otherwise = x:[] -- "x"
+#+end_src
+
+A função =treeFromList= permanece identica e agora podemos fazer o print da
+estrutura.
+
+#+begin_src haskell
+main = do
+  putStrLn "Int binary tree: "
+  print $ treeFromList [7,2,4,8,1,3,6,21,12,23]
+#+end_src
+
+#+begin_src shell
+Int binary tree:
+< 7
+: |--2
+: |  |--1
+: |  `--4
+: |     |--3
+: |     `--6
+: `--8
+:    `--21
+:       |--12
+:       `--23
+#+end_src
+
+Agora está bem melhor!! A raiz é identificada pelo uso do caractere =<= no
+inicio da linha e cada linha subsequente começa com =:=. Mas nós também podemos
+utilizar essa estrutura com outros tipos:
+
+#+begin_src haskell
+  putStrLn "\nString binary tree:"
+  print $ treeFromList ["foo","bar","baz","gor","yog"]
+#+end_src
+
+#+begin_src shell
+String binary tree:
+< "foo"
+: |--"bar"
+: |  `--"baz"
+: `--"gor"
+:    `--"yog"
+#+end_src
+
+Dado que agora podemos testar igualdade e comparar arvores, nós também podemos
+criar arvores dentro de arvores!
+
+#+begin_src haskell
+  putStrLn "\nBinary tree of Char binary trees:"
+  print ( treeFromList
+           (map treeFromList ["baz","zara","bar"]))
+#+end_src
+
+#+begin_src shell
+Binary tree of Char binary trees:
+< < 'b'
+: : |--'a'
+: : `--'z'
+: |--< 'b'
+: |  : |--'a'
+: |  : `--'r'
+: `--< 'z'
+:    : `--'a'
+:    :    `--'r'
+#+end_src
+
+Esse é o motivo que eu escolhi utilizar o prefixo de cada linha com =:= (exceto
+a raiz)
+
+[[file:images/_20210726_201437screenshot.png]]
+
+#+begin_src haskell
+ putStrLn "\nTree of Binary trees of Char binary trees:"
+  print $ (treeFromList . map (treeFromList . map treeFromList))
+             [ ["YO","DAWG"]
+             , ["I","HEARD"]
+             , ["I","HEARD"]
+             , ["YOU","LIKE","TREES"] ]
+#+end_src
+
+É o equivalente a:
+
+#+begin_src haskell
+print ( treeFromList (
+          map treeFromList
+             [ map treeFromList ["YO","DAWG"]
+             , map treeFromList ["I","HEARD"]
+             , map treeFromList ["I","HEARD"]
+             , map treeFromList ["YOU","LIKE","TREES"] ]))
+#+end_src
+
+que resulta em:
+
+#+begin_src shell
+Binary tree of Binary trees of Char binary trees:
+< < < 'Y'
+: : : `--'O'
+: : `--< 'D'
+: :    : |--'A'
+: :    : `--'W'
+: :    :    `--'G'
+: |--< < 'I'
+: |  : `--< 'H'
+: |  :    : |--'E'
+: |  :    : |  `--'A'
+: |  :    : |     `--'D'
+: |  :    : `--'R'
+: `--< < 'Y'
+:    : : `--'O'
+:    : :    `--'U'
+:    : `--< 'L'
+:    :    : `--'I'
+:    :    :    |--'E'
+:    :    :    `--'K'
+:    :    `--< 'T'
+:    :       : `--'R'
+:    :       :    |--'E'
+:    :       :    `--'S'
+#+end_src
+
+Note como arvores duplicadas não são inseridas; existe somente uma arvore
+correspondendo a ="I", "HEARD"=. Nós ganhamos isso (quase) de graça porque nós
+definimos o tipo BinTree para ser uma instância de =Eq=.
+
+Perceba o quão legal essa estrutura é: Nós podemos criar arvores contendo
+inteiros, strings, chars, e também outras arvores.
+
 
 *** Estruturas infinitas
 
