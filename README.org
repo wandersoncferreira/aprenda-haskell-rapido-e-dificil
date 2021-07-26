@@ -1160,6 +1160,101 @@ lugar errado, por exemplo.
 
 *** Inferência de tipos
 
+Tipagem estática é geralmente essencial para execuções rápidas, mas a maioria
+das linguagens tipadas são ruins em generalizar conceitos. Uma das maiores
+vantagens do Haskell é ser capaz de *inferir tipos*
+
+Segue um simples exemplo, a função =square= em Haskell:
+
+#+begin_src haskell
+square x = x * x
+#+end_src
+
+Essa função pode aceitar qualquer tipo númerico. Você pode passar um =Int=,
+=Integer=, =Float=, =Fractional=, ou até mesmo o tipo =Complex=.
+
+#+begin_src shell
+% ghci
+GHCi, version 7.0.4:
+...
+Prelude> let square x = x*x
+Prelude> square 2
+4
+Prelude> square 2.1
+4.41
+Prelude> -- load the Data.Complex module
+Prelude> :m Data.Complex
+Prelude Data.Complex> square (2 :+ 1)
+3.0 :+ 4.0
+#+end_src
+
+=x :+ y= é a notação do número complexo (x + iy).
+
+Agora compare com a quantidade de código necessário para fazer a mesma coisa em
+=C=.
+
+#+begin_src c
+int     int_square(int x) { return x*x; }
+
+float   float_square(float x) {return x*x; }
+
+complex complex_square (complex z) {
+    complex tmp;
+    tmp.real = z.real * z.real - z.img * z.img;
+    tmp.img = 2 * z.img * z.real;
+}
+
+complex x,y;
+y = complex_square(x);
+#+end_src
+
+Para cada tipo, você precisa definir uma nova função. A único truque para fazer
+isso de uma maneira mais concisa em C é utilizar meta-programação, por exemplo,
+utilizando pré-processadores.
+
+Em C++ existe uma forma melhor, usando C++ templates:
+
+#+begin_src c++
+#include <iostream>
+#include <complex>
+using namespace std;
+
+template<typename T>
+T square(T x)
+{
+    return x*x;
+}
+
+int main() {
+    // int
+    int sqr_of_five = square(5);
+    cout << sqr_of_five << endl;
+    // double
+    cout << (double)square(5.3) << endl;
+    // complex
+    cout << square( complex<double>(5,3) )
+         << endl;
+    return 0;
+}
+#+end_src
+
+A funcionalidade do C++ comparado com o C é bem melhor, porém para funções mais
+complexas a sintaxe pode ser bem complicada de seguir: veja esse [[https://bartoszmilewski.com/2009/10/21/what-does-haskell-have-to-do-with-c/][artigo]] por
+exemplo. Em C++ você precisa declarar que uma função pode aceitar diferentes
+tipos, em Haskell acontece ao contrário: a função vai ser tão geral quanto
+possível por padrão.
+
+A inferência de tipos em Haskell nos provê a sensação de liberdade que
+linguagens dinamicamente tipadas tem, mas diferente de linguagens dinamicamente
+tipadas, a maioria dos erros são pegos antes do programa chegar em tempo de
+execução.
+
+Geralmente em Haskell:
+
+#+begin_quote
+Se compila, certamente faz o que você queria.
+#+end_quote
+
 *** Construção de tipos
 
 *** Tipos recursivos
