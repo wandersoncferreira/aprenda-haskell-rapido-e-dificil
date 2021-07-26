@@ -990,7 +990,7 @@ foldl f z [x1,...xn] ⇔ f (... (f (f z x1) x2) ...) xn
 
 Mas como Haskell é preguiçoso, ele não calcula =(f z x)= imediatamente e
 simplesmente carrega o valor para a stack. Esse é o motivo que geralmente usa-se
-o =foldl'= no lugar do =foldl=; =foldl= é a versão =strict= do =foldl=. Se você
+o =foldl\'= no lugar do =foldl=; =foldl\'= é a versão =strict= do =foldl=. Se você
 não entende o que é preguiçoso e =strict=, não se preocupe, siga o código como
 se =foldl= e =foldl'= fossem identicos.
 
