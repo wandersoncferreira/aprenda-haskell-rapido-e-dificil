@@ -931,9 +931,205 @@ evenSum = accumSum 0
 
 [[file:images/_20210725_195232screenshot.png]]
 
+Para fazer as coisas ainda melhores, nós devemos utilizar funções de ordens
+elevadas. O que são esses monstros? Funções de ordem elevadas são funções que
+recebem outras funções como parâmetros.
+
+Alguns exemplos:
+#+begin_src haskell
+filter :: (a -> Bool) -> [a] -> [a]
+map :: (a -> b) -> [a] -> [b]
+foldl :: (a -> b -> a) -> a -> [b] -> a
+#+end_src
+
+
+Vamos prosseguir em passos pequenos.
+
+#+begin_src haskell
+-- versao 5
+evenSum l = mysum 0 (filter even l)
+  where
+    mysum n [] = n
+    mysum n (x:xs) = mysum (n+x) xs
+#+end_src
+
+sendo que
+#+begin_src haskell
+filter even [1..10] ⇔ [2,4,6,8,10]
+#+end_src
+
+A função =filter= recebe uma função do tipo =(a -> Bool)= e uma lista do tipo
+=[a]= e retorna uma lista contendo somente elementos em que a função informada
+retornou =true=.
+
+Nosso próximo passo é utilizar uma outra técnica para realizar a mesma coisa que
+o =loop=. Nós vamos utilizar a função =foldl= para acumular os valores enquanto
+atravessamos a lista. A função =foldl= captura esse padrão geral de código:
+
+#+begin_src haskell
+myfunc list = foo initialValue list
+foo accumulated [] = accumulated
+foo tmpValue (x:xs) = foo (var tmpValue x) xs
+
+#+end_src
+
+Que pode ser simplesmente substituido por:
+#+begin_src haskell
+myfunc list = foldl bar initialValue list
+#+end_src
+
+Se você quer realmente saber como a mágica acontece, essa é a definição de
+=foldl=:
+
+#+begin_src haskell
+foldl f z [] = z
+foldl f z (x:xs) = foldl f (f z x) xs
+
+foldl f z [x1,...xn] ⇔ f (... (f (f z x1) x2) ...) xn
+#+end_src
+
+Mas como Haskell é preguiçoso, ele não calcula =(f z x)= imediatamente e
+simplesmente carrega o valor para a stack. Esse é o motivo que geralmente usa-se
+o =foldl'= no lugar do =foldl=; =foldl= é a versão =strict= do =foldl=. Se você
+não entende o que é preguiçoso e =strict=, não se preocupe, siga o código como
+se =foldl= e =foldl'= fossem identicos.
+
+Agora, a nossa nova versão de =evenSum= se torna:
+
+#+begin_src haskell
+-- Versao 6
+-- foldl' não é accessível por padrão
+-- nós precisamos importar do modulo Data.List
+
+import Data.List
+evenSum l = foldl' mysum 0 (filter even l)
+  where mysum acc value = acc + value
+#+end_src
+
+Nós podemos simplificar essa Implementação utilizando a notação lambda. Dessa
+forma, não precisamos criar um nome temporário =mysum=
+
+#+begin_src haskell
+-- versao 7
+-- geralmente é considerado uma boa prática
+-- em importar somente as funções necessárias de um módulo
+import Data.List (foldl')
+evenSum l = foldl' (\x y -> x + y) 0 (filter even l)
+#+end_src
+
+Logo notamos que:
+#+begin_src haskell
+(\x y -> x+y) ⇔ (+)
+#+end_src
+
+Finalmente temos nossa versão final:
+#+begin_src haskell
+-- versao 8
+import Data.List (foldl')
+evenSum :: Integral a => [a] -> a
+evenSum l = foldl' (+) 0 (filter even l)
+#+end_src
+
+=foldl'= não é uma função fácil de entender. Se você não está acostumado com
+ela, você deveria estudá-la um pouco. Para ajudar o entendimento do que está
+acontecendo dentro da função, segue um passo a passo do fluxo de execução:
+
+#+begin_src haskell
+  evenSum [1,2,3,4]
+⇒ foldl' (+) 0 (filter even [1,2,3,4])
+⇒ foldl' (+) 0 [2,4]
+⇒ foldl' (+) (0+2) [4]
+⇒ foldl' (+) 2 [4]
+⇒ foldl' (+) (2+4) []
+⇒ foldl' (+) 6 []
+⇒ 6
+#+end_src
+
+Uma outra função de ordem elevado é a =(.)=. A função =(.)= corresponde a
+composição matemática.
+
+#+begin_src haskell
+(f . g . h) x ⇔ f (g (h x))
+#+end_src
+
+Nós podemos utilizar a composição para reduzir a nossa função =evenSum=
+
+#+begin_src haskell
+-- versao 9
+import Data.List (foldl')
+evenSum :: Integral a => [a] -> a
+evenSum = (foldl' (+) 0) . (filter even)
+#+end_src
+
+Além disso, nós podemos até renomear cada uma das partes para tornar ainda mais
+claro:
+
+#+begin_src haskell
+-- versao 10
+import Data.List (foldl')
+sum' :: (Num a) => [a] -> a
+sum' = foldl'(+) 0
+evenSum :: Integral a => [a] -> a
+evenSum = sum'. (filter even)
+#+end_src
+
+Agora é hora de discutir a direção que nosso código tomou enquanto introduziamos
+mais idiomas funcionais. O que ganhamos ao introduzir funções de ordens
+elevadas?
+
+A principio você pode pensar que a principal diferença é o quão enxuto o código
+está, mas de fato, tem muito mais a ver com uma forma de pensar melhor. Suponha
+que queremos modificar nossa função para, por exemplo, calcular a soma de todos
+os pares ao quadrado de uma lista qualquer:
+
+#+begin_src shell
+[1,2,3,4] -> [1,4,9,16] -> [4, 16] -> 2
+#+end_src
+
+Atualizando a versão 10 é extremamente fácil:
+
+#+begin_src haskell
+squareEvenSum = sum' . (filter even) . (map (^2))
+squareEvenSum' = evenSum . (map (^2))
+#+end_src
+
+Nós só tivemos que adicionar uma "função de transformação" adicional.
+
+A função =map= apenas aplica uma função em todos os elementos de uma lista.
+
+Nós não tivemos que modificar nada *dentro* da definição da função original, ou
+seja, esse comportamento faz com que nosso código seja mais modular. Mas além
+disso, você pode pensar de forma mais matemática sobre suas funções. Você pode
+tratar essa nova função como se fosse uma função builtin, ou seja, você pode
+utilizá-la junto com map, fold, filter, etc.
+
+Modificar a versão 1 para o novo requisito é deixado como exercício para o
+leitor ☺.
+
+Se você acha que chegamos no final da *generalização*, então você está muito
+errado! Por exemplo, existe uma forma de utilizar essa função não apenas em
+listas mas em qualquer estrutura de dados de tipo recursivo. Se você quer saber
+como, eu sugiro a leitura desse artigo bem divertido: [[http://eprints.eemcs.utwente.nl/7281/01/db-utwente-40501F46.pdf][Functional Programming
+with Bananas, Lenses, Envelopes and Barbed Wire by Meijer, Fokkinga and Paterson]].
+
+Esse exemplo deveria ter te mostrado o quão interessante programação puramente
+funcional pode ser, porém infelizmente, usar programação puramente funcional não
+é aconselhável para todos os casos de uso. Ou pelo menos nenhuma linguagem que
+atenda esse requisito foi encontrada ainda.
+
+Um dos super poderes do HAskell é a habilidade de criar DSLs (Domain Specific
+Language) sendo bem fácil de trocar o paradigma de programação. De fato, Haskell
+é também muito bom caso você queira programar no estilo imperativo.
+
+Entender isso foi realmente muito difícil para mim enquanto aprendia sobre
+Haskell. Muito esforço tende ser colocado para explicar a superioridade da
+abordagem funcional e depois quando você começa usar o estilo imperativo no
+Haskell pode ser um pouco difícil entender quando e como usar isso.
+
+Mas antes de falar sobre esse outro super-poder do Haskell, nós devemos falar
+sobre outro aspecto essencial do Haskell: Tipos.
 
 ** Tipos
-
 
 [[file:images/_20210725_195248screenshot.png]]
 
@@ -947,6 +1143,5 @@ evenSum = accumSum 0
 *** Arvores
 
 *** Estruturas infinitas
-
 
 [[file:images/_20210725_195405screenshot.png]]
