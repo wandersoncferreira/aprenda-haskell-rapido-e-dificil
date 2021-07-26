@@ -27,7 +27,7 @@
 
 ** Exploda sua cabeça com Haskell
 
-#+attr_html: :center
+#+attr_html: :align center
 [[file:images/_20210725_102116screenshot.png]]
 
 Um tutorial pequeno e denso para aprender Haskell.
