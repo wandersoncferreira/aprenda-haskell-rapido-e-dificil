@@ -1148,7 +1148,15 @@ tl;dr:
 - =deriving= é mágico e cria funções para você
 #+end_quote
 
+Em Haskell, tipos são fortes e estáticos.
 
+Por que isso é importante? Isso vai te ajudar *muito* a evitar erros. Em
+Haskell, a maioria dos defeitos são pegos durante a fase de compilação do
+programa e o principal responsável são as inferências de tipo feitas pelo
+compilador.
+
+Inferência de tipo torna fácil detectar onde você usou o parâmetro errado no
+lugar errado, por exemplo.
 
 *** Inferência de tipos
 
