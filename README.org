@@ -1822,14 +1822,17 @@ f = do
 - para definir um valor em um objeto nós usamos =<-=
 - o tipo de cada linha no próximo exemplo é =IO *=;
   - =action1 ::: IO b=
-  - action2 x :: IO ()
-  - action3 :: IO c
-  - action4 x y :: IO a
-  - x ::b=, y :: c
+  - =action2 x ::: IO ()=
+  - =action3 ::: IO c=
+  - =action4 x y ::: IO a=
+  - =x ::: b=, =y ::: c=
 - poucos objetos tem o tipo =IO a=, isso deveria ajudar você a escolher. Em
   particular você não pode usar funções puras diretamente nesses casos. Para
   usar uma função pura, você poderia fazer =action2 (purefunction x)= por
   exemplo.
+
+Aviso: Por causa de algum problema no markdown Github, eu precisei utilizar o
+simbolo =:::= no lugar de =::= acima.
 
 #+end_quote
 
