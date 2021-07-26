@@ -17,6 +17,13 @@
     - [[#tipos-recursivos][Tipos recursivos]]
     - [[#arvores][Arvores]]
     - [[#estruturas-infinitas][Estruturas infinitas]]
+- [[#nível-de-dificuldade---hell][Nível de dificuldade - HELL]]
+  - [[#lidando-com-io][Lidando com IO]]
+  - [[#explicando-truques-com-io][Explicando truques com IO]]
+  - [[#monads][Monads]]
+  - [[#a-lista-monad][A lista monad]]
+- [[#anexo][Anexo]]
+  - [[#mais-sobre-arvore-infinita][Mais sobre Arvore Infinita]]
 
 ** Exploda sua cabeça com Haskell
 
@@ -1145,3 +1152,32 @@ sobre outro aspecto essencial do Haskell: Tipos.
 *** Estruturas infinitas
 
 [[file:images/_20210725_195405screenshot.png]]
+
+
+* Nível de dificuldade - HELL
+
+** Lidando com IO
+
+
+[[download:_20210725_211341screenshot.png]]
+
+
+** Explicando truques com IO
+
+
+[[download:_20210725_211405screenshot.png]]
+
+** Monads
+
+
+[[download:_20210725_211428screenshot.png]]
+
+** A lista monad
+
+
+[[download:_20210725_211442screenshot.png]]
+
+
+* Anexo
+
+** Mais sobre Arvore Infinita
