@@ -8,7 +8,7 @@
 - [[#haskell-básico][Haskell básico]]
   - [[#notações][Notações]]
   - [[#notações-para-funções-uteis][Notações para funções uteis]]
-- [[#nível-de-dificuldade---hard][Nível de dificuldade - HARD:]]
+- [[#nível-de-dificuldade---hard][Nível de dificuldade - HARD]]
   - [[#estilo-funcional][Estilo funcional]]
   - [[#funções-de-ordem-elevadas][Funções de ordem elevadas]]
   - [[#tipos][Tipos]]
@@ -669,7 +669,7 @@ Python, má indentação pode quebrar seu código!
 #+end_quote
 
 
-* Nível de dificuldade - HARD:
+* Nível de dificuldade - HARD
 
 A parte difícil pode começar agora.
 
@@ -1788,10 +1788,51 @@ main = print $ treeTakeDepth 4 infTreeTwo
 
 * Nível de dificuldade - HELL
 
+Parabéns por chegar até aqui! Agora, nós precisamos entrar em uma parte
+realmente complicado.
+
+Se você é como eu, você deve entender o estilo funcional. Você deve também
+entender um pouco mais sobre as vantagens de =laziness= por padrão, mas você não
+entende de verdade por onde começar quando você precisa escrever um programa
+real. E em particular:
+
+- Como você lida com efeitos?
+- Por que existe essa noção estranha inspirada em programação imperativa para lidar com IO?
+
+Se prepare, as respostas podem ser um pouco complexas, mas elas são todas
+bastante recompensadoras.
+
 ** Lidando com IO
 
-
 [[file:images/_20210725_211341screenshot.png]]
+
+#+begin_quote
+tl;dr:
+
+Uma função fazendo =IO= parece com um programa tipicamente imperativo:
+#+begin_src haskell
+f :: IO a
+f = do
+  x <- action1
+  action2 x
+  y <- action3
+  action4 x y
+#+end_src
+
+- para definir um valor em um objeto nós usamos =<-=
+- o tipo de cada linha no próximo exemplo é =IO *=
+  + =action1 :: IO b=
+  + =action2 x :: IO ()=
+  + =action3 :: IO c=
+  + =action4 x y :: IO a=
+  + =x ::b=, =y :: c=
+- poucos objetos tem o tipo =IO a=, isso deveria ajudar você a escolher. Em
+  particular você não pode usar funções puras diretamente nesses casos. Para
+  usar uma função pura, você poderia fazer =action2 (purefunction x)= por
+  exemplo.
+
+#+end_quote
+
 
 
 ** Explicando truques com IO
