@@ -1255,7 +1255,104 @@ Geralmente em Haskell:
 Se compila, certamente faz o que você queria.
 #+end_quote
 
+------
+
 *** Construção de tipos
+
+Você pode construir seus próprios tipos. Primeiramente, você pode criar apelidos
+ou tipos que são sinônimos.
+
+#+begin_src haskell
+type Name  = String
+type Color = String
+
+showInfos :: Name -> Color -> String
+showInfos name color = "Name: " ++ name ++ ", Color: " ++ color
+
+name :: Name
+name = "Robin"
+color :: Color
+color = "Blue"
+
+main = putStrLn $ showInfos name color
+#+end_src
+
+------
+
+Mas isso não protege muito a sua função, tente trocar os dois parâmetros de
+lugar e executar o seu programa:
+
+#+begin_src haskell
+putStrLn showInfos color name
+#+end_src
+
+Essa alteração vai compilar e executar. De fato, você pode trocar Name, Color, e
+String em todos os lugares. Para o compilador esses tipos são tratados da mesma
+forma, eles são completamente idênticos.
+
+Uma outra forma é criar seu próprio tipo usando a _keyword_ =data=.
+
+#+begin_src haskell
+data Name = NameConstr String
+data Color = ColorConstr String
+
+showInfos :: Name -> Color -> String
+showInfos (NameConstr name) (ColorConstr color) =
+      "Name: " ++ name ++ ", Color: " ++ color
+
+name  = NameConstr "Robin"
+color = ColorConstr "Blue"
+main = putStrLn $ showInfos name color
+#+end_src
+
+Agora se você trocar os parâmetros da função =showInfos=, o compilador vai
+reclamar! Dessa forma, esse potencial erro você não vai cometer novamente.
+
+Note que os contrutores são funções:
+
+#+begin_src haskell
+NameConstr  :: String -> Name
+ColorConstr :: String -> Color
+#+end_src
+
+A sintaxe da =data= é basicamente:
+
+#+begin_src haskell
+data typeName = ConstructorName [types]
+  | ConstructorName2 [types]
+  | ...
+#+end_src
+
+Geralmente se utiliza o mesmo nome para o DataTypeName e DataTypeConstructor.
+
+Exemplo:
+
+#+begin_src haskell
+data Complex a = Num a => Complex a a
+#+end_src
+
+Você também pode utilizar a sintaxe de hashmaps.
+
+#+begin_src haskell
+data DataTypeName = DataConstructor {
+  field1 :: [type of field1],
+  field2 :: [type of field2],
+  field3 :: [type of field3],
+  ...
+  fieldn :: [type of fieldn]}
+#+end_src
+
+E vários acessores são criados para você. Exemplo:
+
+#+begin_src haskell
+data Complex a = Num => Complex { real :: a, img :: a }
+c = Complex 1.0 2.0
+z = Complex { real = 3, img = 4 }
+real c ⇒ 1.0
+img z ⇒ 4
+#+end_src
+
+------
 
 *** Tipos recursivos
 
