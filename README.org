@@ -1821,7 +1821,7 @@ f = do
 
 - para definir um valor em um objeto nós usamos =<-=
 - o tipo de cada linha no próximo exemplo é =IO *=;
-  - =action1 \:\: IO b=
+  - =action1 \:: IO b=
   - action2 x :: IO ()
   - action3 :: IO c
   - action4 x y :: IO a
