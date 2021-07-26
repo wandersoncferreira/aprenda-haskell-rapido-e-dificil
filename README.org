@@ -1124,7 +1124,7 @@ funcional pode ser, porém infelizmente, usar programação puramente funcional 
 é aconselhável para todos os casos de uso. Ou pelo menos nenhuma linguagem que
 atenda esse requisito foi encontrada ainda.
 
-Um dos super poderes do HAskell é a habilidade de criar DSLs (Domain Specific
+Um dos super poderes do Haskell é a habilidade de criar DSLs (Domain Specific
 Language) sendo bem fácil de trocar o paradigma de programação. De fato, Haskell
 é também muito bom caso você queira programar no estilo imperativo.
 
@@ -1139,6 +1139,15 @@ sobre outro aspecto essencial do Haskell: Tipos.
 ** Tipos
 
 [[file:images/_20210725_195248screenshot.png]]
+
+#+begin_quote
+tl;dr:
+- =type Name = AnotherType= é somente um alias e o compilador não ve nenhuma diferença entre os dois
+- =data Name = NameConstructor AnotherType= são tipos diferentes para o compilador
+- =data= pode construir estruturas que podem ser recursivas
+- =deriving= é mágico e cria funções para você
+#+end_quote
+
 
 
 *** Inferência de tipos
