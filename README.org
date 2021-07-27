@@ -2512,8 +2512,182 @@ main = askUser >>=
 
 ** Monads
 
-
 [[file:images/_20210725_211428screenshot.png]]
+
+Agora o segredo pode ser revelado: =IO= é uma =monad=. Ser uma =monad= significa
+que você tem acesso há algumas sintaxes especiais com a notação =do=, porém,
+principalmente, você tem acesso há alguns padrões de código que vão facilitar o
+fluxo do seu código.
+
+#+begin_quote
+*Observações importantes*
+
+- Monad não é necessariamente sobre _efeitos_! Existem diversas monads que são puras
+- Monad é sobre sequenciamento
+
+#+end_quote
+
+Em Haskell, =Monad= é uma classe de tipos. Logo, para ser uma instancia dessa
+classe de tipos, você deve implementar as funções =>>== e =return=. A função
+=(>>)= é derivada de =>>==. Segue como a classe tipo =Monad= é declarada.
+
+#+begin_src haskell
+class Monad m where
+  (>>=) :: m a -> (a -> m b) -> m b
+  return :: a -> m a
+
+  (>>) :: m a -> m b -> m b
+  f >> g = f >>= \_ -> g
+
+  -- você deveria ignorar essa funcao =fail=
+  -- que eu acredito que exista apenas por motivos historicos
+  fail :: String -> m a
+  fail = error
+#+end_src
+
+#+begin_quote
+Observações:
+
+- a palabra-chave =class= não é sua amiga! Uma classe Haskell não é uma classe
+  no mesmo sentido que você encontra em linguagens de programação orientada a
+  objetos. Uma classe em Haskell se parece mais com uma interface em Java. Uma
+  definição melhor seria =typeclass= dado que ela significa um conjunto de
+  tipos. Para um tipo pertencer a uma classe, todas as funções da classe devem
+  ser implementadas.
+- nesse exemplo especifico de classe de tipo, o tipo =m= deve ser um tipo que
+  recebe um argumento, por exemplo =IO a=, mas também =Maybe a=, =[a]=, etc.
+- para ser uma monad útil, sua função deve obedecer algumas regras. Se suas
+  funções não obedecerem essas regras, coisas estranhas vão acontecer:
+
+  #+begin_src haskell
+return a >>= k == k a
+m >>= return == m
+m >>= (\x -> k x >>= h) == (m >>= k) >>= h
+  #+end_src
+
+#+end_quote
+
+
+*Maybe é uma monad*
+
+Existem várias instancias de =Monad=, uma das mais fáceis de descrever é a
+=Maybe=. Se você tem uma sequencia de valores =Maybe=, você pode usar monads
+para manipular esses valores. Isso é particularmente util para remover
+estruturas complicadas de =if..then..else..=.
+
+Imagine uma operação complexa em um banco. Você está elegivel para receber 700
+euros somente se você suportar a seguinte lista de operações sem que o seu saldo
+fique abaixo de zero.
+
+#+begin_src haskell
+deposit  value account = account + value
+withdraw value account = account - value
+
+eligible :: (Num a,Ord a) => a -> Bool
+eligible account =
+  let account1 = deposit 100 account in
+    if (account1 < 0)
+    then False
+    else
+      let account2 = withdraw 200 account1 in
+      if (account2 < 0)
+      then False
+      else
+        let account3 = deposit 100 account2 in
+        if (account3 < 0)
+        then False
+        else
+          let account4 = withdraw 300 account3 in
+          if (account4 < 0)
+          then False
+          else
+            let account5 = deposit 1000 account4 in
+            if (account5 < 0)
+            then False
+            else
+              True
+
+main = do
+  print $ eligible 300 -- True
+  print $ eligible 299 -- False
+#+end_src
+
+Agora, vamos fazer isso utilizando o =Maybe= e o fato de ser uma Monad.
+
+#+begin_src haskell
+deposit :: (Num a) => a -> a -> Maybe a
+deposit value account = Just (account + value)
+
+withdraw :: (Num a,Ord a) => a -> a -> Maybe a
+withdraw value account = if (account < value)
+                         then Nothing
+                         else Just (account - value)
+
+eligible :: (Num a, Ord a) => a -> Maybe Bool
+eligible account = do
+  account1 <- deposit 100 account
+  account2 <- withdraw 200 account1
+  account3 <- deposit 100 account2
+  account4 <- withdraw 300 account3
+  account5 <- deposit 1000 account4
+  Just True
+
+main = do
+  print $ eligible 300 -- Just True
+  print $ eligible 299 -- Nothing
+#+end_src
+
+Não ficou tão ruim, mas podemos simplificar ainda mais.
+
+#+begin_src haskell
+deposit :: (Num a) => a -> a -> Maybe a
+deposit value account = Just (account + value)
+
+withdraw :: (Num a,Ord a) => a -> a -> Maybe a
+withdraw value account = if (account < value)
+                         then Nothing
+                         else Just (account - value)
+
+eligible :: (Num a, Ord a) => a -> Maybe Bool
+eligible account =
+  deposit 100 account >>=
+  withdraw 200 >>=
+  deposit 100  >>=
+  withdraw 300 >>=
+  deposit 1000 >>
+  return True
+
+main = do
+  print $ eligible 300 -- Just True
+  print $ eligible 299 -- Nothing
+#+end_src
+
+Dessa forma conseguimos provar que Monads são boas formas de tornar o seu código
+mais elegante. Note que essa ideia de generalização de código, em particular
+para o tipo =Maybe= pode ser usado na maioria das linguagens imperativas.
+
+#+begin_quote
+Observação importante:
+
+O primeiro elemengo na sequencia que o resultado der =Nothing= vai parar o fluxo
+de execução. Isso significa que você não executa todas as linhas, você recebe
+isso de graça, graças ao comportamento =lazy= do Haskell.
+
+#+end_quote
+
+Você poderia também refazer esses exemplos tendo em menter a definição de =>>== para =Maybe=
+
+#+begin_src haskell
+instance Monad Maybe where
+  (>>=) :: Maybe a -> (a -> Maybe b) -> Maybe b
+  Nothing >>= _ = Nothing
+  (Just x) >>= f = f x
+  return x = Just x
+#+end_src
+
+A monad =Maybe= se mostrou util mesmo dentro desse exemplo simples. Nós também
+vimos a utilidade da monad =IO=, mas agora vamos olhar um exemplo mais
+interessante, listas.
 
 ** A lista monad
 
