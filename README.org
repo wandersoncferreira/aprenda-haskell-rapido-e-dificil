@@ -2691,9 +2691,43 @@ interessante, listas.
 
 ** A lista monad
 
-
 [[file:images/_20210725_211442screenshot.png]]
 
+A lista monad nos ajuda a simular cálculos determinísticos. Aqui vamos nós:
+
+#+begin_src haskell
+import Control.Monad (guard)
+
+allCases = [1..10]
+resolve :: [(Int, Int, Int)]
+resolve = do
+  x <- allCases
+  y <- allCases
+  z <- allCases
+  guard $ 4*x + 2*y < z
+  return (x, y, z)
+
+main = do
+  print resolve
+#+end_src
+
+MAGICA!
+
+#+begin_src shell
+[(1,1,7),(1,1,8),(1,1,9),(1,1,10),(1,2,9),(1,2,10)]
+#+end_src
+
+Usar monads simplifica muitas manipulações em linguagens puras, em particular,
+monads são muito uteis para:
+
+- IO
+- computação determinística
+- gerar numeros pseudo aleatórios
+- manter estado de configurações
+- escrever em estado
+- ...
+
+Se você me seguiu até aqui, então você conseguiu! Você conhece monads!
 
 * Anexo
 
