@@ -1836,10 +1836,237 @@ simbolo =:::= no lugar de =::= acima.
 
 #+end_quote
 
+Nessa seção, eu vou explicar como usar IO, não como ele funciona. Você vai ver
+como Haskell separa as funções puras das partes impuras do seu programa.
 
+Não pare porque você está tentando entender os detalhes da sintaxe, as respostas
+vão chegar nas próximas seções.
+
+O que vamos fazer?
+
+#+begin_quote
+Pergunte ao usuário para entrar uma lista de números. Exiba a soma desses
+números.
+#+end_quote
+
+#+begin_src haskell
+toList :: String -> [Integer]
+toList input = read ("[" ++ input ++ "]")
+
+main = do
+  putStrLn = "Entre uma lista de numeros (separados por virgula)"
+  input <- getLine
+  print $ sum (toList input)
+#+end_src
+
+Deve ser simples entender o comportamento desse programa. Vamos analizar os
+tipos com mais detalhes.
+
+#+begin_src haskell
+putStrLn :: String -> IO ()
+getLine :: IO String
+print :: Show a => a -> IO ()
+#+end_src
+
+
+Mais interessante ainda, note que cada expressão dentro do bloco =do= tem o tipo
+de =IO a=
+
+#+begin_src haskell
+main = do
+  putStrLn "Entre ..." :: IO ()
+  getLine              :: IO String
+  print Alguma coisa   :: IO ()
+#+end_src
+
+Também devemos prestar atenção aos efeitos do simbolo =<-=
+#+begin_src haskell
+do
+  x <- alguma-coisa
+#+end_src
+
+Se =alguma-coisa :: IO a= então =x :: a=.
+
+Outra coisa importante sobre o u so de =IO=: Todas as linhas dentro do bloco
+=do= devem ter uma de duas formas possíveis:
+
+#+begin_src haskell
+action1           :: IO a
+                     --- nesse caso, geralmente a = ()
+#+end_src
+
+ou
+
+#+begin_src haskell
+valor <- action2     -- onde
+                     -- action2 :: IO b
+                     -- valor :: b
+#+end_src
+
+Essas duas formas de expressar IO vão implicar em formas diferentes de
+sequenciar ações no futuro. O significado disso vai ficar mais claro no final da
+próxima seção.
+
+--------
+
+Agora vamos ver como esse programa se comporta. Por exemplo, o que acontece caso
+o usuário digite alguma coisa sem sentido? Vamos tentar:
+
+#+begin_src haskell
+ % runghc 02_progressive_io_example.lhs
+    Enter a list of numbers (separated by comma):
+    foo
+    Prelude.read: no parse
+#+end_src
+
+Argh!! Uma mensagem de erro do mau e o programa quebrou! Nossa primeira melhoria
+vai ser simplesmente responder com uma mensagem mais amigável caso o usuário
+faça isso novamente.
+
+Para conseguir fazer isso, nós temos que ser capaz de detectar que algo deu
+errado. Uma outra forma de fazer isso é utilizar o tipo =Maybe=, esse é um tipo
+de dado bem comum em Haskell.
+
+#+begin_src haskell
+import Data.Maybe
+#+end_src
+
+Mas o que é esse tipo =Maybe=? É um tipo que recebe apenas um parâmetro e sua
+definição é:
+
+#+begin_src haskell
+data Maybe a = Nothing | Just a
+#+end_src
+
+Essa é uma forma bem legal de detectar se houve um erro enquanto tentamos criar
+ou calcular um determinado valor. A função =maybeRead= é um bom exemplo disso,
+essa função é bem similar ao =read= mas se alguma coisa der errado ela vai
+retornar o valor =Nothing= e caso dê tudo certo, vai retornar o valor =Just <o
+valor>=.
+
+Não gaste muito tempo tentando entender tudo sobre essa função por enquanto.
+
+#+begin_src haskell
+maybeRead :: Read a => String -> Maybe a
+maybeRead s = case reads s of
+                [(x, "")] -> Just x
+                _         -> Nothing
+#+end_src
+
+Agora um pouco mais legível, vamos escrever uma função da seguinte forma: Caso a
+string tenha o formato errado, vamos retornar =Nothing=, mas caso a entrada
+tenha o valor correto, por exemplo "1,2,3", vamos retornar =Just [1,2,3]=.
+
+#+begin_src haskell
+getListFromString :: String -> Maybe [Integer]
+getListFromString str = maybeRead $ "[" ++ str ++ "]"
+#+end_src
+
+Agora basta testarmos o valor no nosso programa principal:
+
+#+begin_src haskell
+main :: IO ()
+main = do
+  putStrLn "Entre uma lista de numeros (separados por virgula):"
+  input <- getLine
+  let maybeList = getListFromString input in
+    case maybeList of
+      Just l -> print (sum l)
+      Nothing -> error "Formato errado. Adeus!"
+#+end_src
+
+Em caso de erro, nós retornamos uma mensagem de erro amigável.
+
+Note que o tipo de cada uma das expressões dentro do bloco principal =do=
+permanece sendo =IO a=. A única parte esquisita é o =error=. Eu vou apenas dizer
+aqui que o =error msg= tem o tipo necessário para o que precisamos (=IO ()=).
+
+Uma coisa muito importante para perceber é o tipo de todas as funções definidas
+até agora. Existe apenas uma função que tem =IO= em seu tipo: =main=. Isso
+significa que =main= não é pura, mas usa a função =getListFromString= que é
+pura. Portanto, fica claro apenas olhando para as definições dos tipos quais são
+as funções puras ou não.
+
+Por que esse característica de ser pura importa? Dentre outras vantagens podemos listar:
+- é mais fácil pensar sobre funções puras do que impuras
+- funções puras te protegem de todos os erros no seu sistema que são difíceis de
+  reproduzir devido a efeitos-colaterais
+- você pode avaliar funções puras em qualquer ordem ou em parallel sem nenhum risco.
+
+Esses são alguns dos motivos pelos quais você deveria colocar tanto código
+quanto for possível dentro de funções puras.
+
+------
+
+Nossa próxima iteração vai ser perguntar ao usuário varias e varias vezes até
+que ele informe entradas válidas.
+
+Vamos manter a primeira parte:
+
+#+begin_src haskell
+import Data.Maybe
+
+maybeRead :: Read a => String -> Maybe a
+maybeRead s = case reads s of
+                  [(x,"")]    -> Just x
+                  _           -> Nothing
+getListFromString :: String -> Maybe [Integer]
+getListFromString str = maybeRead $ "[" ++ str ++ "]"
+#+end_src
+
+Agora nós criamos uma função que vai perguntar usuário pela lista de inteiros
+até que ele entre corretamente.
+
+#+begin_src haskell
+askUser :: IO [Integer]
+askUser = do
+  putStrLn "Entre uma lista de numeros (separados por virgula):"
+  input <- getLine
+  let maybeList = getListFromString input in
+    case maybeList of
+      Just l -> return l
+      Nothing -> askUser
+#+end_src
+
+Essa função é do tipo =IO [Integer]= e significa que nós receber o valor do tipo
+=[Integer]= através alguma ação de IO. Algumas pessoas diriam:
+
+#+begin_quote
+Isso é um =[Integer]= dentro de =IO=
+#+end_quote
+
+Se você quer entender os detalhes por trás de tudo isso, você vai ter que ler a
+próxima seção, mas a realidade é que se você só quer *usar* o IO, pratique um
+pouco e se lembre de pensar sobre os tipos.
+
+Finalmente, nossa função principal é muito mais simples agora:
+
+#+begin_src haskell
+main :: IO ()
+main = do
+  list <- askUser
+  print $ sum list
+#+end_src
+
+Nós terminamos aqui com a nossa introdução sobre =IO=. Foi um pouco rápido!
+Essas são as principais coisas para se lembrar:
+
+- dentro do bloco =do=, cada expressão precisa ter um tipo =IO a=. Sendo assim
+  você fica limitado a quantidade de expressões disponíveis, por exemplo,
+  =getLine=, =print=, =putStrLn=, etc...
+- tente mover as funções puras para fora desse bloco o máximo possível
+- o tipo =IO= significa: uma ação IO que retorna um elemento do tipo =a=. =IO=
+  representa ações, por debaixo dos panos, =IO= é o tipo de uma função, mas leia
+  a próxima seção se você está curioso.
+
+Se você praticar um pouco, você vai ser capaz de *usar* =IO=.
+
+#+begin_quote
+Exercício:
+- Faça um programa que some todos os argumentos. Dica: use a função =getArgs=.
+#+end_quote
 
 ** Explicando truques com IO
-
 
 [[file:images/_20210725_211405screenshot.png]]
 
