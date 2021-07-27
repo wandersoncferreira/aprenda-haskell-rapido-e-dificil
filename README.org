@@ -2157,6 +2157,358 @@ seria algo como:
 main :: World -> World
 #+end_src
 
+Não são todas as funções que precisam ter acesso a essa variavel. As funções que
+tem acesso são as impuras.
+
+Haskell considera o estado do mundo externo como uma variável de entrada da
+função =main=, mas o tipo verdadeiro de =main= está mais próximo de:
+
+#+begin_src haskell
+main :: World -> ((), World)
+#+end_src
+
+O =()= é o tipo unitário. Nada demais aqui.
+
+Agora vamos re-escrever nossa função principal com isso em mente:
+
+#+begin_src haskell
+main w0 =
+  let (list, w1) = askUser w0 in
+  let (x, w2) = print (sum list, w1) in
+  x
+#+end_src
+
+Primeiro, notamos que todas as funções com efeitos colaterais precisam ter o tipo:
+
+#+begin_src haskell
+World -> (a, World)
+#+end_src
+
+onde =a= é o tipo do resultado. Por exemplo, a função =getChar= deveria ter o
+tipo =World -> (Char, World)=.
+
+Outra coisa interessante é o truque para concertar a ordem de avaliação. Em
+Haskell, para avaliar =f a b= você tem diversas opções:
+
+- primeiro avaliar =a=, depois =b=, depois =f a b=
+- primeiro avaliar =b=, depois =a=, depois =f a b=
+- avaliar =a= e =b= em paralelo e depois =f a b=
+
+Isso é verdadeiro porque nós estamos trabalho na parte pura da linguagem.
+
+Agora, se você olhar para a função principal =main= fica claro que você precisa
+avaliar a primeira linha antes da segunda porque para avaliar a segunda linha
+você depende de um parâmetro que é dado pela primeira linha.
+
+O compilador vai apontar para uma nova versão do mundo externo, por trás dos
+panos o =print= vai funcionar da seguinte forma:
+
+- mostre alguma coisa na tela
+- modifique o id que referencia o mundo externo
+- calcule como =((), novo mundo externo id)=
+
+Agora, se você olhar para o estilo da função principal, é claramente esquisito.
+Vamos fazer a mesma coisa com a função =askUser=:
+
+#+begin_src haskell
+askUser :: World -> ([Integer], World)
+#+end_src
+
+Antes:
+
+#+begin_src haskell
+askUser :: IO [Integer]
+askUser = do
+  putStrLn "Entre uma lista de numeros:"
+  input <- getLine
+  let maybeList = getListFromString input in
+    case maybeList of
+      Just l -> return l
+      Nothing -> askUser
+#+end_src
+
+
+Depois:
+#+begin_src haskell
+askUser w0 =
+  let (_, w1)     = putStrLn "Entre uma lista de numeros:" in
+  let (input, w2) = getLine w1 in
+  let (l, w3)     = case getListFromString input of
+                      Just l -> (l, w2)
+                      Nothing -> askUser w2
+  in
+    (l, w3)
+#+end_src
+
+
+Isso é similar, mas estranho, veja todos essas variáveis temporárias =w?=.
+
+A lição aqui é clara: Implementações simplificadas de IO em linguagens puramente
+funcionais é estranho!
+
+Felizmente existe uma forma melhor de tratar esse problema. Vamos ver um padrão,
+cada linha acima tem a seguinte forma:
+
+#+begin_src haskell
+let (y, w')  = action x w in
+#+end_src
+
+Mesmo que para algumas linhas o primeiro argumento =x= não seja necessário. O
+tipo do resultado é =(resposta, novoMundo)= logo cada função =f= deve ter o tipo:
+
+#+begin_src haskell
+f :: World -> (a, World)
+#+end_src
+
+Ou seja, estamos seguindo sempre o mesmo padrão abaixo
+
+#+begin_src haskell
+let (y, w1) = action w0 in
+let (z, w2) = action w1 in
+let (t, w3) = action w2 in
+...
+#+end_src
+
+E cada ação (=action=) pode conter de 0 a =n= parâmetros e em particular eles
+podem receber um parâmetro vindo da linha anterior:
+
+#+begin_src haskell
+let (_,w1) = action1 x w0   in
+let (z,w2) = action2 w1     in
+let (_,w3) = action3 z w2 in
+...
+#+end_src
+
+
+[[file:images/_20210727_122926screenshot.png]]
+
+
+Agora vamos fazer um truque de mágica! Nós vamos os simbolos temporarios dos
+mundos externos =w?= "desaparecerem". Nós vamos usar =bind= nas duas linhas.
+
+Vamos definir a função =bind=, note que o seu tipo pode ser bem intimidador de
+inicio:
+
+#+begin_src haskell
+bind :: (World -> (a, World))
+       -> (a -> (World -> (b, World)))
+       -> (World -> (b, World))
+#+end_src
+
+Mas se lembre que =(World -> (a, World))= é o tipo de uma ação IO, vamos
+renomear isso para deixar mais claro.
+
+#+begin_src haskell
+type IO a = World -> (a, World)
+#+end_src
+
+Alguns exemplos de funções:
+
+#+begin_src haskell
+getLine :: IO String
+print :: Show a => a -> IO ()
+#+end_src
+
+=getLine= é uma ação IO que recebe o mundo externo como um parâmetro e retorna
+alguns =(String, World)=. Isso pode ser resumido falando que =getLine= tem o
+tipo =IO String=
+
+A função =print= também é interessante. Ela recebe um argumento que possa ser
+mostrado na tela. De fato, ela recebe dois argumentos. O primeiro é o valor que
+vai ser mostrado e o segundo é o estado do mundo externo. Depois retorna algo
+com tipo =((), World))= que significa que a função alterou o estado do mundo
+externo mas não produziu nenhum resultado de retorno.
+
+Esse noto tipo =IO a= nos ajuda a simplificar o tipo do =bind=:
+
+#+begin_src haskell
+bind :: IO a
+        -> (a -> IO b)
+        -> IO b
+#+end_src
+
+Isso quer fizer que o =bind= recebe duas ações de IO como parametros e retorna
+outra ação de IO.
+
+Agora, lembre-se do padrão importante que tinhamos notado. De inicio era:
+
+#+begin_src haskell
+pattern1  w0 =
+  let (x, w1) = action1 w0 in
+  let (y, w2) = action2 x w1 in
+  (y, w2)
+#+end_src
+
+Veja os tipos:
+
+#+begin_src haskell
+action1   :: IO a
+action2   :: a -> IO b
+pattern1  :: IO b
+#+end_src
+
+Não parece familiar?
+
+#+begin_src haskell
+(bind action1 action2) w0 =
+  let (x, w1) = action1 w0
+      (y, w2) = action2 x w1
+  in  (y, w2)
+#+end_src
+
+A ideia aqui é esconder as variáveis que correspondem ao mundo externo. Vamos
+lá: Como um exemplo, imagine que você queira simular o seguinte:
+
+#+begin_src haskell
+let (line1, w1) = getLine w0 in
+let ((), w2)    = print line1 in
+  ((), w2)
+#+end_src
+
+Agora, usando a função =bind=
+
+#+begin_src haskell
+(res, w2) = (bind getLine print) w0
+#+end_src
+
+Como o =print= é do tipo =Show a => a -> (World, ((), World))=, nós sabemos que
+=res = ()= (tipo =unit=). Se você não conseguiu ver a mágica aqui, vamos tentar
+com essas três linhas agora:
+
+#+begin_src haskell
+let (line1, w1) = getLine w0 in
+let (line2, w2) = getLine w1 in
+let ((), w3)    = print (line1 ++ line2 ) in
+  ((), w3)
+#+end_src
+
+Que é equivalente a:
+
+#+begin_src haskell
+(res, w3) = (bind getLine (\line1 ->
+                             (bind getLine (\line2 ->
+                                              print (line1 ++ line2))))) w0
+#+end_src
+
+Não reparou em algo? Nenhuma variável do mundo externo é usada em lugar algum.
+Isso é má-gi-ca!
+
+Nós podemos utilizar uma notação melhor. Vamos usar =>>== no lugar de =bind=. A
+função =>>== é uma função infixa igual ao =(+)= ou seja =3 + 4 <-> (+) 3 4=
+
+#+begin_src haskell
+(res, w3) = (getLine >>=
+            (\line1 -> getLine >>=
+            (\line2 -> print (line1 ++ line2)))) w0
+#+end_src
+
+Para nossa sorte, o Haskell tem uma sintaxe legal para isso:
+
+#+begin_src haskell
+do
+  x <- action1
+  y <- action2
+  z <- action3
+  ...
+#+end_src
+
+É trocado por:
+
+#+begin_src haskell
+action1 >>= (\x ->
+action2 >>= (\y ->
+action3 >>= (\z ->
+...
+)))
+#+end_src
+
+Note que você pode usar =x= na =action2= e =x= e =y= na =action3=.
+
+Mas e as linhas que não estão usando =<-=? Como elas ficam? Fácil, basta criar
+uma outra função chamada =blindBind=:
+
+#+begin_src haskell
+blindBind :: IO a -> IO b -> IO b
+blindBind action1 action2 w0 =
+  bind action1 (\_ -> action2) w0
+#+end_src
+
+Eu não simplifiquei essa definição para deixá-la mais clara, porém nós podiamos
+ter usado uma notação melhor: =>>=
+
+e
+
+#+begin_src haskell
+do
+  action1
+  action2
+  action3
+#+end_src
+
+é transformado em
+#+begin_src haskell
+action1 >>
+action2 >>
+action3
+#+end_src
+
+Uma outra função bem util é essa aqui:
+
+#+begin_src haskell
+putInIO :: a -> IO a
+putInIO x = IO (\w -> (x, w))
+#+end_src
+
+Essa é uma forma de colocar valores puros dentro de um contexto de IO. O nome
+geral dado em Haskell para a função =putInIO= é o =return= (esse nome é bem ruim
+em Haskell porque o conceito de =return= aqui é bem diferente do que você
+normalmente usa em outras linguagens)
+
+------
+
+Para finalizar, vamos traduzir o nosso exemplo:
+
+#+begin_src haskell
+askUser :: IO [Integer]
+askUser = do
+  putStrLn "Enter a list of numbers (separated by commas):"
+  input <- getLine
+  let maybeList = getListFromString input in
+      case maybeList of
+          Just l  -> return l
+          Nothing -> askUser
+
+main :: IO ()
+main = do
+  list <- askUser
+  print $ sum list
+#+end_src
+
+para
+
+#+begin_src haskell
+import Data.Maybe
+
+maybeRead :: Read a => String -> Maybe a
+maybeRead s = case reads s of
+                  [(x,"")]    -> Just x
+                  _           -> Nothing
+getListFromString :: String -> Maybe [Integer]
+getListFromString str = maybeRead $ "[" ++ str ++ "]"
+askUser :: IO [Integer]
+askUser =
+    putStrLn "Enter a list of numbers (sep. by commas):" >>
+    getLine >>= \input ->
+    let maybeList = getListFromString input in
+      case maybeList of
+        Just l -> return l
+        Nothing -> askUser
+
+main :: IO ()
+main = askUser >>=
+  \list -> print $ sum list
+#+end_src
+
 
 ** Monads
 
