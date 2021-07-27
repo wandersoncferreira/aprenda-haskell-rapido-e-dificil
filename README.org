@@ -4,6 +4,7 @@
   - [[#instalação][Instalação]]
   - [[#não-tenha-medo][Não tenha medo]]
   - [[#haskell-muito-básico][Haskell muito básico]]
+    - [[#declaração-de-funções][Declaração de Funções]]
     - [[#um-exemplo-usando-tipos][Um exemplo usando Tipos]]
 - [[#haskell-básico][Haskell básico]]
   - [[#notações][Notações]]
@@ -30,9 +31,9 @@
 
 Um tutorial pequeno e denso para aprender Haskell.
 
-Eu realmente acredito que todos os desenvolvedores deveriam aprender Haskell. Eu
-não acho que todo mundo precisa ser super Haskell ninjas, mas que pelo menos
-pudessem descobrir o que o Haskell tem para oferecer.
+Eu realmente acredito que todos os desenvolvedores deveriam aprender Haskell,
+não acho que todo mundo precisa ser super ninjas em Haskell, mas pelo menos
+possam descobrir o que o Haskell tem para oferecer.
 
 Aprender Haskell abre sua mente.
 
@@ -44,24 +45,24 @@ As linguagens de programação mais utilizadas compartilham as mesmas fundaçõe
 - estruturas de dados, objetos e classes
 
 Haskell é bem diferente. A linguagem usa vários conceitos que eu nunca tinha
-ouvido falar antes. Muitos desses conceitos vão ajudar você a se tornar um
+ouvido falar antes e muitos desses conceitos vão ajudar você a se tornar um
 programador melhor.
 
 Mas aprender Haskell pode ser bem difícil. Foi assim pra mim. Nesse artigo eu
-tento passar o que faltou pra mim enquanto eu aprendia Haskell.
+tento passar o que faltou enquanto eu aprendia Haskell.
 
-Esse artigo vai ser difícil de ser seguido. Isso é proposital. Não há atalhos
+Esse artigo vai ser difícil de ser seguido e isso é proposital. Não há atalhos
 para aprender Haskell. É difícil e desafiador, mas eu acredito que isso é uma
 coisa boa.
 
 O método convencional para aprender Haskell se resume em ler dois livros.
 Primeiro, "[[http://learnyouahaskell.com/][Learn You a Haskell]]" e depois "[[http://book.realworldhaskell.org][Real World Haskell]]". Eu acredito que
-essa é a melhor forma de fato, mas para aprender do que se trata Haskell de
-verdade, você precisa ler esses livros nos detalhes.
+essa é a melhor forma de fato e para aprender do que se trata Haskell de
+verdade, você precisa ler esses livros com bastante atenção.
 
 Em contrapartida, esse artigo é uma visão geral bem resumida e densa de todas os
 aspectos gerais de Haskell. Eu também adicionei algumas informações que eu não
-tinha quando eu aprendi Haskell.
+tinha quando eu iniciei com Haskell.
 
 O artigo contém 5 partes:
 
@@ -106,10 +107,11 @@ Nota{Wand}: Caso você use o Emacs, recomendo o [[https://github.com/hlissner/do
 [[file:images/_20210725_105402screenshot.png]]
 
 Muitos livros e artigos sobre Haskell iniciam com alguma formula esotérica
-(quicksort, Fibonacci, etc). Eu vou pelo extremo oposto. De inicio não vou te
-mostrar nenhum super poder do Haskell. Eu vou iniciar com as similaridades entre
-Haskell e outras linguagens de programação. Vamos começar com o obrigatório
-"Hello World".
+(quicksort, Fibonacci, etc), mas eu vou pelo extremo oposto aqui. De inicio não
+vou te mostrar nenhum super poder do Haskell. Vamos iniciar com as similaridades
+entre Haskell e as outras linguagens de programação.
+
+Vamos começar com o obrigatório "Hello World".
 
 #+begin_src haskell
 main = putStrLn "Hello World!"
@@ -132,7 +134,7 @@ Hello World!
 -------
 
 Agora vamos criar um programa perguntando pelo seu nome e respondendo "Hello"
-usando o nome que você forneceu:
+usando o nome que você forneceu de entrada:
 
 #+begin_src haskell
 main = do
@@ -182,7 +184,7 @@ função =main= é =IO()=. Isso significa que =main= vai causar algum efeito
 colateral.
 
 Lembre-se que Haskell pode se parecer bastante com linguagens de programação
-mais comuns.
+mais comuns, principalmente quando estamos iniciando e precisamos lidar com IO.
 
 ** Haskell muito básico
 
@@ -194,27 +196,29 @@ essenciais do Haskell.
 
 *Funcional*
 
-Haskell é uma linguagem funcional. Se você vem tem experiência com linguagens
+Haskell é uma linguagem funcional. Se você tem experiência com linguagens
 imperativas, você vai precisar aprender um monte de coisas novas. Felizmente,
-muitos desses novos conceitos vão te ajudar a programar até nas linguagens
-imperativas.
+muitos desses novos conceitos vão te ajudar a programar melhor até nas
+linguagens imperativas.
 
 
 *Tipagem Estática Inteligente*
 
 No lugar de te atrapalhar como no caso de =C=, =C++=, ou =Java=, o sistema de
-tipos do Haskell tenta o máximo possível te ajudar.
+tipos do Haskell tenta nos ajudar o máximo possível.
 
 
 *Pureza*
 
 Geralmente suas funções não vão modificar nada fora seu ambiente de execução.
 Isso significa que essas funções não podem modificar valores de variáveis, não
-podem pegar valores de entrada de usuários, não podem escrever na sua tela, não
-podem lançar misseis. Por outro lado, paralelismo vai ser bem fácil de alcançar.
-Haskell deixa muito claro onde os *efeitos* podem ocorrer e onde o seu código é
-puro. Dessa forma, vai ser bem mais fácil de racionalizar sobre o seu programa e
-a maioria dos bugs vai ser prevenido nas partes puras do seu programa.
+podem pegar valores de entrada de usuários, não podem escrever na sua tela, e
+não podem lançar misseis.
+
+Por outro lado, paralelismo vai ser bem fácil de conseguir implementar. Haskell
+deixa muito claro onde os *efeitos* podem ocorrer e onde o seu código é puro.
+Dessa forma, vai ser bem mais fácil de racionalizar sobre o funcionamento do seu
+programa e a maioria dos bugs vai ser prevenido nas partes puras.
 
 Além disso, funções puras seguem uma lei fundamental em Haskell:
 
@@ -225,51 +229,51 @@ Aplicar uma função com os mesmos parâmetros vai sempre retornar o mesmo resul
 
 *Laziness*
 
-*Laziness* (preguiça) ser o comportamento padrão é bastante incomum em
+*Laziness* (preguiça) é um comportamento padrão que é bastante incomum em
 linguagens de programação. Por padrão, Haskell só vai calcular algo quando for
-necessário. Por consequência disso, Haskell também prove uma forma elegante de
-manipular estruturas infinitas, por exemplo.
+estritamente necessário. Por consequência disso, Haskell também prove uma forma
+elegante de manipular estruturas infinitas, por exemplo.
 
-Um ultimo aviso sobre como você deveria ler um código Haskell. Para mim, a
-leitura é como se fosse um artigo cientifico. Algumas partes são claras, mas
-quando você encontra uma formula, só foque e leia mais devagar. Além disso,
-enquanto aprende Haskell, realmente não importa se você não entendeu os detalhes
-da sintaxe. Por exemplo, caso encontre um =>>==, =<$>=, =<-= ou qualquer outro
+Um ultimo aviso sobre como deveriamos ler um código Haskell: Para mim, a leitura
+é como se fosse um artigo cientifico. Algumas partes são claras, mas quando você
+encontra uma formula, só foque e leia mais devagar. Além disso, enquanto aprende
+Haskell, realmente não importa se entendeu os detalhes da sintaxe nos minimos
+detalhes. Dessa forma, caso encontre um =>>==, =<$>=, =<-= ou qualquer outro
 simbolo esquisito, só ignore eles e continue seguindo o fluxo de execução do
-código
+programa.
 
-*** COMMENT Declaração de Funções
+*** Declaração de Funções
 
 Você pode estar acostumado a declarar funções dessa forma:
 
-In C:
+Em C:
 #+begin_src c
 int f(int x, int y) {
     return x*x + y*y;
 }
 #+end_src
 
-In JavaScript:
+Em JavaScript:
 #+begin_src javascript
 function f(x,y) {
     return x*x + y*y;
 }
 #+end_src
 
-In Python:
+Em Python:
 #+begin_src python
 def f(x,y):
     return x*x + y*y
 #+end_src
 
-In Ruby:
+Em Ruby:
 #+begin_src ruby
 def f(x,y)
   x*x + y*y
 end
 #+end_src
 
-In Scheme:
+Em Scheme:
 #+begin_src scheme
 (define (f x y)
   (+ (* x x) (* y y)))
@@ -282,9 +286,9 @@ f x y = x**x + y*y
 
 Bem limpo. Sem parenteses, sem =def=.
 
-Não se esqueça que Haskell usa muito funções e tipos, dessa forma é bem simples
-definir esses elementos. A sintaxe foi particularmente escolhida para esses
-objetos.
+Não se esqueça que Haskell usa muitas funções e tipos, logo precisa ser bem
+simples definir esses elementos. A sintaxe foi particularmente escolhida para
+esses objetos.
 
 
 *** Um exemplo usando Tipos
