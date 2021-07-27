@@ -2070,6 +2070,94 @@ Exercício:
 
 [[file:images/_20210725_211405screenshot.png]]
 
+#+begin_quote
+tl;dr:
+
+Para separar partes puras e impuras, =main= é definida como uma função que
+modifica o estado do mundo externo.
+
+#+begin_src haskell
+main :: World -> World
+#+end_src
+
+A função tem garantia de conter efeitos colaterais somente se tiver esse tipo,
+mas veja como é uma função main tipica.
+
+#+begin_src haskell
+main w0 =
+  let (v1, w1) = action1 w0 in
+  let (v2, w2) = action2 v1 w1 in
+  let (v3, w3) = action3 v2 w2 in
+  action4 v3 w3
+#+end_src
+
+Nós temos vários elementos temporários sendo criados nesse exemplo (=w1=, =w2=,
+e =w3=) que deve ser passado para a próxima ação.
+
+Nós criamos uma função chamada =bind= ou (=>>==), com o =bind= nós não
+precisamos de nomes temporários mais:
+
+#+begin_src haskell
+main =
+  action1 >>= action2 >>= action3 >>= action4
+#+end_src
+
+Extra: Haskell tem uma sintaxe mais fácil para fazer o =bind=
+
+#+begin_src haskell
+main = do
+  v1 <- action1
+  v2 <- action2 v1
+  v3 <= action3 v2
+  action4 v3
+#+end_src
+
+#+end_quote
+
+Por que nós usamos essa sintaxe estranha e o que é exatamente esse tipo =IO=?
+Parece um pouco como mágica.
+
+Por enquanto vamos esquecer todas as partes puras do nosso sistema e focar na
+parte impura:
+
+#+begin_src haskell
+askUser :: IO [Integer]
+askUser = do
+  putStrLn "Entre uma lista de numeros (separados por virgula): "
+  input <- getLine
+  let maybeList = getListFromString input in
+    case maybeList of
+      Just l -> return l
+      Nothing -> askUser
+
+main :: IO ()
+main = do
+  list <- askUser
+  print $ sum list
+#+end_src
+
+Primeira impressão: Esse código parece imperativo. Haskell é expressivo o
+suficiente para fazer código impuro parecer imperativo, por exemplo, se você
+deseja criar um =while= em Haskell é possível. De fato, para lidar com =IO= o
+estilo imperativo é geralmente o mais apropriado.
+
+Mas você deve ter notado que a notação é um pouco não usual. Em uma linguagem
+impura, o estado do mundo externo pode ser entendido como uma grande variável
+estado global escondida. Essa variável escondida é acessível por todas as
+funções da sua linguagem. Por exemplo, você pode ler ou escrever em um arquivo
+de dentro de qualquer função. O fato do arquivo existir ou não é a diferença
+entre possíveis estados que o mundo externo pode ter.
+
+Em Haskell, o estado atual do mundo externo não está escondido. Pelo contrário,
+o estado é *explicitamente* declarado e dizemos que =main= é uma função que
+*potencialmente* troca o estado do mundo externo. Portanto, o tipo de =main=
+seria algo como:
+
+#+begin_src haskell
+main :: World -> World
+#+end_src
+
+
 ** Monads
 
 
