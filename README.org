@@ -564,9 +564,9 @@ Em Haskell as Strings são listas de =Char=
 #+end_src
 
 #+begin_quote
-Alerta: Em códigos reais você não deveria usar lista de =Char= para representar
-texto. Você deve utilizar o modulo =Data.Text=. Caso queira representar uma
-=stream= de ASCII char, você pode usar =Data.ByteString=.
+Alerta: Em códigos reais não deveríamos usar listas de =Char= para representar
+texto. Devemos utilizar o modulo =Data.Text=. Caso queira representar uma
+=stream= de ASCII char, usamos =Data.ByteString=.
 #+end_quote
 
 *Tuplas*
@@ -587,7 +587,7 @@ snd (x,y,z) ⇒ ERROR snd :: (a,b) -> b
 
 *Parenteses*
 
-Para remover parenteses você pode fazer uso de duas funções: =($)= e =(.)=
+Para remover parenteses usamos essas duas funções: =($)= e =(.)=
 
 #+begin_src haskell
 -- By default
@@ -621,8 +621,8 @@ f :: (a -> b) -> c   ⇔ f é uma função que mapeia de (a->b) para c
 #+end_src
 
 Lembre-se que definir o tipo de uma função antes de declará-la não é
-obrigatório. O Haskell infere os tipos mais gerais para você, mas é considerado
-uma boa prática para fazer de qualquer forma.
+obrigatório. Haskell infere os tipos mais gerais possíveis para você, mas é
+considerado uma boa prática.
 
 *Notação infixa*
 
@@ -649,7 +649,7 @@ square''' = (^2)
 
 *Testes*
 
-Uma implementação da função =absoluta=.
+Uma implementação da função =absolute=.
 
 #+begin_src haskell
 absolute :: (Ord a, Num a) => a -> a
@@ -657,7 +657,7 @@ absolute x = if x >= 0 then x else -x
 #+end_src
 
 Note que =if .. then .. else= em Haskell é bem parecido com o operador ternário
-=¤?¤:¤=. Você não pode esquecer de informar o =else=.
+=¤?¤:¤=. Não podemos esquecer de informar o =else=.
 
 Outra versão equivalente:
 #+begin_src haskell
@@ -674,7 +674,7 @@ Python, má indentação pode quebrar seu código!
 
 * Nível de dificuldade - HARD
 
-A parte difícil pode começar agora.
+A parte difícil começa agora.
 
 ** Estilo funcional
 
