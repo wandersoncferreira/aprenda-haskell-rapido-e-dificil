@@ -16,6 +16,7 @@
     - [[#inferência-de-tipos][Inferência de tipos]]
     - [[#construção-de-tipos][Construção de tipos]]
     - [[#tipos-recursivos][Tipos recursivos]]
+    - [[#arvores][Arvores]]
     - [[#estruturas-infinitas][Estruturas infinitas]]
 - [[#nível-de-dificuldade---hell][Nível de dificuldade - HELL]]
   - [[#lidando-com-io][Lidando com IO]]
@@ -1212,7 +1213,7 @@ complex x,y;
 y = complex_square(x);
 #+end_src
 
-Para cada tipo, você precisa definir uma nova função. A único truque para fazer
+Para cada tipo, precisamos definir uma nova função. O único truque para fazer
 isso de uma maneira mais concisa em C é utilizar meta-programação, por exemplo,
 utilizando pré-processadores.
 
@@ -1248,10 +1249,9 @@ exemplo. Em C++ você precisa declarar que uma função pode aceitar diferentes
 tipos, em Haskell acontece ao contrário: a função vai ser tão geral quanto
 possível por padrão.
 
-A inferência de tipos em Haskell nos provê a sensação de liberdade que
-linguagens dinamicamente tipadas tem, mas diferente de linguagens dinamicamente
-tipadas, a maioria dos erros são pegos antes do programa chegar em tempo de
-execução.
+A inferência de tipos em Haskell passa a sensação de liberdade que linguagens
+dinamicamente tipadas tem, mas diferente de linguagens dinamicamente tipadas, a
+maioria dos erros são pegos antes do programa chegar em tempo de execução.
 
 Geralmente em Haskell:
 
@@ -1263,8 +1263,8 @@ Se compila, certamente faz o que você queria.
 
 *** Construção de tipos
 
-Você pode construir seus próprios tipos. Primeiramente, você pode criar apelidos
-ou tipos que são sinônimos.
+Você também pode construir seus próprios tipos. Primeiramente, você pode criar
+apelidos ou tipos que são sinônimos com tipos existentes.
 
 #+begin_src haskell
 type Name  = String
@@ -1310,7 +1310,7 @@ main = putStrLn $ showInfos name color
 #+end_src
 
 Agora se você trocar os parâmetros da função =showInfos=, o compilador vai
-reclamar! Dessa forma, esse potencial erro você não vai cometer novamente.
+reclamar! Dessa forma, esse potencial erro não vai acontecer novamente.
 
 Note que os contrutores são funções:
 
@@ -1335,7 +1335,7 @@ Exemplo:
 data Complex a = Num a => Complex a a
 #+end_src
 
-Você também pode utilizar a sintaxe de hashmaps.
+Você também pode utilizar a sintaxe de _registros_.
 
 #+begin_src haskell
 data DataTypeName = DataConstructor {
@@ -1360,16 +1360,16 @@ img z ⇒ 4
 
 *** Tipos recursivos
 
-Você já encontrou um tipo recursivo: listas. Você pode recriar listas, mas
+Você já encontrou um tipo recursivo por aqui: listas. Podemos recriar listas
 usando uma sintaxe mais prolixa.
 
 #+begin_src haskell
 data List a = Empty | Cons a (List a)
 #+end_src
 
-Se você quer ser capaz de mostrar (=Show=), ler (=Read=), testar igualdade
-(=Eq=), e fazer comparações (=Ord=) com sua nova estrutura de dados, você pode
-avisar o Haskell para derivar as funções apropriadas para você:
+Se quiser mostrar (=Show=), ler (=Read=), testar igualdade (=Eq=), e fazer
+comparações (=Ord=) com sua nova estrutura de dados, precisamos avisar o Haskell
+para derivar as funções apropriadas para você:
 
 #+begin_src haskell
 infixr 5 :::
@@ -1377,23 +1377,21 @@ data List a = Nil | a ::: (List a)
   deriving (Show, Read, Eq, Ord)
 #+end_src
 
-Quando você adiciona =deriving (Show)= para a sua estrutura de dados, Haskell
-cria a função =show= para você. Embreve nós vamos utilizar essa função e você
-verá como utilizá-la.
+Quando adicionamos =deriving (Show)= para a estrutura de dados, Haskell cria a
+função =show= automaticamente. Embreve vamos utilizar essa função e as coisas
+vão ficar mais claras.
 
-*** COMMENT Arvores
+*** Arvores
 
 [[file:images/_20210726_160704screenshot.png]]
 
-
-Vamos explorar outro exemplo padrão: arvores binárias.
+Vamos explorar outro exemplo padrão: *arvores binárias*.
 
 #+begin_src haskell
 import Data.List
 data BinTree a = Empty
   | Node a (BinTree a) (BinTree a) deriving (Show)
 #+end_src
-
 
 Vamos criar uma função que transforma uma lista em uma arvore binaria ordenada.
 
@@ -1430,12 +1428,12 @@ Essa é uma representação útil, mas não muito agradável de uma arvore.
 
 ------
 
-Só por diversão, vamos programar uma versão melhor para mostrar arvores. Eu me
+Só por diversão, vamos programar uma maneira melhor de visualizar arvores. Eu me
 diverti bastante fazendo uma função interessante para mostrar arvores de uma
-forma geral. Você pode pular essa parte se você achar muito difícil de seguir.
+forma geral. Você pode pular essa parte se achar muito difícil de seguir.
 
-Nós temos que fazer algumas poucas mudanças. Vamos remover o =deriving (Show)=
-da declaração do nosso tipo =BinTree=. E vai ser útil tornar a nossa BinTree uma
+Nós temos que fazer poucas mudanças. Vamos remover o =deriving (Show)= da
+declaração do nosso tipo =BinTree=. E será útil tornar a nossa BinTree uma
 instancia de (=Eq= e =Ord=) para que possamos testar igualdades e comparar
 arvores.
 
@@ -1445,8 +1443,8 @@ data BinTree a = Empty
   deriving (Eq, Ord)
 #+end_src
 
-Sem =deriving (Show)=, Haskell não vai criar a função =show= para nós. Nós vamos
-criar nossa própria versão de =show=. Para alcançar isso, nós precisamos
+Sem =deriving (Show)=, Haskell não vai criar a função =show= automaticamente.
+Vamos criar nossa própria versão de =show=. Para alcançar isso, precisamos
 declarar que nosso tipo =BinTree= é uma instancia da classe =Show=. A sintax é:
 
 #+begin_src haskell
@@ -1454,9 +1452,9 @@ instance Show (BinTree a) where
   show t = ...  --- Você pode declarar a sua função aqui
 #+end_src
 
-Essa é a minha versão sobre como mostrar arvores binarias. Não se preocupe com a
-complexidade aparente, eu fiz várias melhorias para conseguir mostrar até
-objetos bem estranhos.
+Essa é a minha versão sobre como visualziar arvores binarias. Não se preocupe
+com a complexidade aparente, eu fiz várias melhorias para conseguir visualizar
+até objetos bem estranhos.
 
 #+begin_src haskell
 -- declare BinTree a to be an instance of Show
@@ -1529,7 +1527,7 @@ Int binary tree:
 #+end_src
 
 Agora está bem melhor!! A raiz é identificada pelo uso do caractere =<= no
-inicio da linha e cada linha subsequente começa com =:=. Mas nós também podemos
+inicio da linha e cada linha subsequente começa com =:=. Mas também podemos
 utilizar essa estrutura com outros tipos:
 
 #+begin_src haskell
@@ -1546,8 +1544,8 @@ String binary tree:
 :    `--"yog"
 #+end_src
 
-Dado que agora podemos testar igualdade e comparar arvores, nós também podemos
-criar arvores dentro de arvores!
+Dado que agora podemos testar igualdade e comparar arvores, também podemos criar
+arvores dentro de arvores!
 
 #+begin_src haskell
   putStrLn "\nBinary tree of Char binary trees:"
@@ -1623,11 +1621,11 @@ Binary tree of Binary trees of Char binary trees:
 #+end_src
 
 Note como arvores duplicadas não são inseridas; existe somente uma arvore
-correspondendo a ="I", "HEARD"=. Nós ganhamos isso (quase) de graça porque nós
-definimos o tipo BinTree para ser uma instância de =Eq=.
+correspondendo a ="I", "HEARD"=.
 
-Perceba o quão legal essa estrutura é: Nós podemos criar arvores contendo
-inteiros, strings, chars, e também outras arvores.
+Ganhamos isso (quase) de graça porque definimos o tipo BinTree para ser uma
+instância de =Eq=. Perceba o quão legal essa estrutura é: Podemos criar arvores
+contendo inteiros, strings, chars, e também outras arvores.
 
 
 *** Estruturas infinitas
