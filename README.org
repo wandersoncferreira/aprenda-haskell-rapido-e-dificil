@@ -1634,11 +1634,12 @@ contendo inteiros, strings, chars, e também outras arvores.
 
 É comum falar que Haskell é _preguiçoso_.
 
-De fato, se você quiser bem preciso, você deveria dizer que Haskell é
-não-estrito. =Laziness= é somente uma implementação comum de linguagens
-não-estritas.
+De fato, se você quiser ser bem preciso, diriamos que Haskell é *não-estrito*.
+=Laziness= é somente uma implementação comum de linguagens não-estritas.
 
-Dessa forma, o que "não-estrita" significa? Diretamente do Haskell wiki:
+Dessa forma, o que "não-estrita" significa?
+
+Diretamente do Haskell wiki:
 
 #+begin_quote
 Redução (o termo matemático para avaliação) procede de fora para dentro.
@@ -1647,7 +1648,7 @@ Assim, se você tem =(a+(b*c))= então você deve primeiro reduzir =+= primeiro,
 depois reduzir a expressão interna =(b*c)=.
 #+end_quote
 
-Por exemplo, nós podemos fazer o seguinte em Haskell:
+Por exemplo, podemos fazer o seguinte em Haskell:
 
 #+begin_src haskell
 -- numbers = [1,2,..]
@@ -1688,7 +1689,7 @@ nullTree = Node 0 nullTree nullTree
 
 Uma arvore binaria completa onde cada nó é igual a 0.
 
-Agora eu vou provar para você que nós podemos manipular esse objeto usando a
+Agora eu vou provar para você que podemos manipular esse objeto usando a
 seguinte função:
 
 #+begin_src haskell
@@ -1709,7 +1710,7 @@ Veja o que acontece com esse programa:
 main = print $ treeTakeDepth 4 nullTree
 #+end_src
 
-Esse código compila, executa e para fornecendo o seguinte resultado:
+Esse código compila, executa e termina fornecendo o seguinte resultado:
 
 #+begin_src shell
 <  0
