@@ -5,7 +5,7 @@
   - [[#não-tenha-medo][Não tenha medo]]
   - [[#haskell-muito-básico][Haskell muito básico]]
     - [[#declaração-de-funções][Declaração de Funções]]
-    - [[#um-exemplo-usando-tipos][Um exemplo usando Tipos]]
+    - [[#exemplo-usando-tipos][Exemplo usando Tipos]]
 - [[#haskell-básico][Haskell básico]]
   - [[#notações][Notações]]
   - [[#notações-para-funções-uteis][Notações para funções uteis]]
@@ -291,13 +291,13 @@ simples definir esses elementos. A sintaxe foi particularmente escolhida para
 esses objetos.
 
 
-*** Um exemplo usando Tipos
+*** Exemplo usando Tipos
 
 Embora não seja obrigatório, a informação sobre o tipo para as funções é
 geralmente feita explicitamente. Não é obrigatório porque o compilador é esperto
 o suficiente para descobrir esses tipos para você. Porém, é uma boa ideia
 declarar os tipos explicitamente porque indica qual era a sua intenção quando
-escreveu o programa e melhora o entendimento de quem for ler o código.
+escreveu o programa e melhora o entendimento de quem for ler o código no futuro.
 
 Vamos experimentar um pouco. A declaração de um tipo se faz usando =::=
 
@@ -394,8 +394,8 @@ mesmo tipo. A variável de tipo =a= pode assumir vários valores de tipos
 diferentes, por exemplo, =Int=, =Integer=, =Float=, etc.
 
 Ou seja, no lugar de ter tipos forçados como em =C= e precisar declarar funções
-para =Int=, =long=, =float=, =double=, etc, nós declaramos apenas uma função
-similar ao que acontece em linguagens dinamicamente tipadas.
+para =Int=, =long=, =float=, =double=, etc, nós declaramos apenas uma função e
+isso é similar ao que acontece em linguagens dinamicamente tipadas.
 
 Esse comportamento é chamado de polimorfismo paramétrico.
 
@@ -404,20 +404,19 @@ também pode ser tipos mais complexos como =Trees= ou outras funções.
 
 Mas nesse caso não vamos esquecer que o nosso tipo está prefixado com =Num a
 =>=. =Num= é uma *classe de tipos*, uma classe de tipos pode ser entendida como
-um conjunto de tipos. =Num= contem tipos que se comportam como números mais
-precisamente, =Num= é o conjunto de tipos que implementam as funções =(+)= e
-=(*)=.
+um conjunto de tipos. =Num= contem tipos que se comportam como números ou seja
+=Num= é o conjunto de tipos que implementam as funções =(+)= e =(*)=.
 
-Classes de tipos são recursos da linguagem muito poderosos. Nós podemos fazer
-coisas bem poderosas com isso, mais sobre isso depois.
+Classes de tipos são recursos muito poderosos da linguagem. Nós podemos fazer
+coisas bem interessantes com isso, veremos mais sobre isso depois.
 
 Finalmente, =Num a => a -> a -> a= significa:
 
 Seja =a= um tipo que pertence ao conjunto de tipos =Num=. Essa é uma função do
 tipo =a= para =a -> a=.
 
-Sim, esquisito. De fato, em Haskell nenhuma função tem dois argumentos na
-realidade. Todas as funções tem apenas um argumento, mas podemos notar que
+Sim, esquisito. De fato, na realidade em Haskell nenhuma função tem dois
+argumentos. Todas as funções tem apenas um argumento, mas podemos notar que
 receber dois argumentos é equivalente a receber apenas um e retornar uma função
 que recebe o segundo.
 
@@ -446,7 +445,7 @@ começando a esquentar. Agora é hora de criar uma aplicação de verdade.
 
 -------
 
-Mas antes disso, nós deveriamos verificar que o sistema de tipos do Haskell está
+Mas antes disso, vamos verificar que o sistema de tipos do Haskell está
 funcionando como o esperado:
 
 #+begin_src haskell
@@ -461,8 +460,8 @@ como =Float= quanto para =Integer=.
 
 --------
 
-Se forçarmos a nossa função para funcionar com tipos de dados diferentes, ela
-vai falhar:
+Se forçarmos a nossa função para aceitar tipos de dados diferentes, ela vai
+falhar:
 
 #+begin_src haskell
 f :: Num a => a -> a -> a
@@ -481,8 +480,8 @@ main = print (f x y)
 O compilador reclama! *Os dois parâmetros precisam ter o mesmo tipo!*
 
 Se você acredita que isso é uma má ideia e que o compilador deveria fazer a
-transformação de um tipo para o outro para você, aconselho você a assistir esse
-ótimo (e engraçado) video: [[https://www.destroyallsoftware.com/talks/wat][WAT]]
+transformação de um tipo para o outro, aconselho assistir esse ótimo (e
+engraçado) video: [[https://www.destroyallsoftware.com/talks/wat][WAT]]
 
 
 * Haskell básico
