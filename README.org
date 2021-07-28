@@ -343,7 +343,7 @@ O problema: =4.2= não é um =Int=.
 --------
 
 A solução: não declare o tipo para a função =f= por enquanto e deixe o Haskell
-inferir o tipo mais genérico que ele conseguir para nós:
+inferir o tipo mais genérico que ele conseguir:
 
 #+begin_src haskell
 f x y = x*x + y*y
@@ -357,7 +357,7 @@ declarar uma função que aceita =Int=, uma para =float=, uma para =long=, uma
 para =double=, etc.
 
 Mas quais tipos devemos declarar? Para descobrir o tipo que o Haskell encontrou
-para nós, vamos utilizar o =ghci= (REPL):
+vamos utilizar o =ghci= (REPL):
 
 #+begin_src shell
 % ghci
@@ -395,7 +395,7 @@ mesmo tipo. A variável de tipo =a= pode assumir vários valores de tipos
 diferentes, por exemplo, =Int=, =Integer=, =Float=, etc.
 
 Ou seja, no lugar de ter tipos forçados como em =C= e precisar declarar funções
-para =Int=, =long=, =float=, =double=, etc, nós declaramos apenas uma função e
+para =Int=, =long=, =float=, =double=, etc, declaramos apenas uma função e
 isso é similar ao que acontece em linguagens dinamicamente tipadas.
 
 Esse comportamento é chamado de polimorfismo paramétrico.
@@ -408,7 +408,7 @@ Mas nesse caso não vamos esquecer que o nosso tipo está prefixado com =Num a
 um conjunto de tipos. =Num= contem tipos que se comportam como números ou seja
 =Num= é o conjunto de tipos que implementam as funções =(+)= e =(*)=.
 
-Classes de tipos são recursos muito poderosos da linguagem. Nós podemos fazer
+Classes de tipos são recursos muito poderosos da linguagem. Podemos fazer
 coisas bem interessantes com isso, veremos mais sobre isso depois.
 
 Finalmente, =Num a => a -> a -> a= significa:
@@ -1010,7 +1010,7 @@ Agora, a nossa nova versão de =evenSum= se torna:
 #+begin_src haskell
 -- Versao 6
 -- foldl' não é accessível por padrão
--- nós precisamos importar do modulo Data.List
+-- precisamos importar do modulo Data.List
 
 import Data.List
 evenSum l = foldl' mysum 0 (filter even l)
@@ -1138,8 +1138,8 @@ Haskell. Muito esforço tende ser colocado para explicar a superioridade da
 abordagem funcional e depois quando você começa usar o estilo imperativo no
 Haskell pode ser um pouco difícil entender quando e como usar isso.
 
-Mas antes de falar sobre esse outro super-poder do Haskell, nós devemos falar
-sobre outro aspecto essencial do Haskell: Tipos.
+Mas antes de falar sobre esse outro super-poder do Haskell, devemos falar sobre
+outro aspecto essencial do Haskell: Tipos.
 
 ** Tipos
 
@@ -1792,13 +1792,14 @@ main = print $ treeTakeDepth 4 infTreeTwo
 
 * Nível de dificuldade - HELL
 
-Parabéns por chegar até aqui! Agora, nós precisamos entrar em uma parte
-realmente complicado.
+Parabéns por chegar até aqui! Agora, precisamos entrar em uma parte realmente
+complicada.
 
-Se você é como eu, você deve entender o estilo funcional. Você deve também
-entender um pouco mais sobre as vantagens de =laziness= por padrão, mas você não
-entende de verdade por onde começar quando você precisa escrever um programa
-real. E em particular:
+Se você é como eu deve entender o estilo funcional. Deve também entender um
+pouco mais sobre as vantagens de =laziness= por padrão, mas você não entende de
+verdade por onde começar quando precisa escrever um programa real.
+
+E em particular:
 
 - Como você lida com efeitos?
 - Por que existe essa noção estranha inspirada em programação imperativa para lidar com IO?
@@ -1823,7 +1824,7 @@ f = do
   action4 x y
 #+end_src
 
-- para definir um valor em um objeto nós usamos =<-=
+- para definir um valor em um objeto usamos =<-=
 - o tipo de cada linha no próximo exemplo é =IO *=;
   - =action1 ::: IO b=
   - =action2 x ::: IO ()=
@@ -1840,11 +1841,11 @@ simbolo =:::= no lugar de =::= acima.
 
 #+end_quote
 
-Nessa seção, eu vou explicar como usar IO, não como ele funciona. Você vai ver
+Nessa seção, vou explicar como usar IO e não como ele funciona. Você vai ver
 como Haskell separa as funções puras das partes impuras do seu programa.
 
-Não pare porque você está tentando entender os detalhes da sintaxe, as respostas
-vão chegar nas próximas seções.
+Não pare porque está tentando entender os detalhes da sintaxe, as respostas vão
+chegar nas próximas seções.
 
 O que vamos fazer?
 
@@ -1872,7 +1873,6 @@ getLine :: IO String
 print :: Show a => a -> IO ()
 #+end_src
 
-
 Mais interessante ainda, note que cada expressão dentro do bloco =do= tem o tipo
 de =IO a=
 
@@ -1891,8 +1891,8 @@ do
 
 Se =alguma-coisa :: IO a= então =x :: a=.
 
-Outra coisa importante sobre o u so de =IO=: Todas as linhas dentro do bloco
-=do= devem ter uma de duas formas possíveis:
+Outra coisa importante sobre o uso de =IO=: Todas as linhas dentro do bloco =do=
+devem ter uma de duas formas possíveis:
 
 #+begin_src haskell
 action1           :: IO a
@@ -1923,13 +1923,13 @@ o usuário digite alguma coisa sem sentido? Vamos tentar:
     Prelude.read: no parse
 #+end_src
 
-Argh!! Uma mensagem de erro do mau e o programa quebrou! Nossa primeira melhoria
+Argh!! Uma mensagem de erro do mau e o programa quebra! Nossa primeira melhoria
 vai ser simplesmente responder com uma mensagem mais amigável caso o usuário
 faça isso novamente.
 
-Para conseguir fazer isso, nós temos que ser capaz de detectar que algo deu
-errado. Uma outra forma de fazer isso é utilizar o tipo =Maybe=, esse é um tipo
-de dado bem comum em Haskell.
+Para conseguir isso temos que ser capazes de detectar que algo deu errado. Uma
+outra forma de fazer isso é utilizar o tipo =Maybe=, esse é um tipo de dado bem
+comum em Haskell.
 
 #+begin_src haskell
 import Data.Maybe
@@ -1979,7 +1979,7 @@ main = do
       Nothing -> error "Formato errado. Adeus!"
 #+end_src
 
-Em caso de erro, nós retornamos uma mensagem de erro amigável.
+Em caso de erro, retornamos uma mensagem de erro amigável.
 
 Note que o tipo de cada uma das expressões dentro do bloco principal =do=
 permanece sendo =IO a=. A única parte esquisita é o =error=. Eu vou apenas dizer
@@ -2018,7 +2018,7 @@ getListFromString :: String -> Maybe [Integer]
 getListFromString str = maybeRead $ "[" ++ str ++ "]"
 #+end_src
 
-Agora nós criamos uma função que vai perguntar usuário pela lista de inteiros
+Agora criamos uma função que vai perguntar para o usuário pela lista de inteiros
 até que ele entre corretamente.
 
 #+begin_src haskell
@@ -2032,7 +2032,7 @@ askUser = do
       Nothing -> askUser
 #+end_src
 
-Essa função é do tipo =IO [Integer]= e significa que nós receber o valor do tipo
+Essa função é do tipo =IO [Integer]= e significa que recebemos o valor do tipo
 =[Integer]= através alguma ação de IO. Algumas pessoas diriam:
 
 #+begin_quote
@@ -2052,7 +2052,7 @@ main = do
   print $ sum list
 #+end_src
 
-Nós terminamos aqui com a nossa introdução sobre =IO=. Foi um pouco rápido!
+Terminamos aqui com a nossa introdução sobre =IO=. Foi um pouco rápido!
 Essas são as principais coisas para se lembrar:
 
 - dentro do bloco =do=, cada expressão precisa ter um tipo =IO a=. Sendo assim
@@ -2095,11 +2095,11 @@ main w0 =
   action4 v3 w3
 #+end_src
 
-Nós temos vários elementos temporários sendo criados nesse exemplo (=w1=, =w2=,
+Temos vários elementos temporários sendo criados nesse exemplo (=w1=, =w2=,
 e =w3=) que deve ser passado para a próxima ação.
 
-Nós criamos uma função chamada =bind= ou (=>>==), com o =bind= nós não
-precisamos de nomes temporários mais:
+Criamos uma função chamada =bind= ou (=>>==), com o =bind= não precisamos de
+nomes temporários mais:
 
 #+begin_src haskell
 main =
@@ -2118,8 +2118,8 @@ main = do
 
 #+end_quote
 
-Por que nós usamos essa sintaxe estranha e o que é exatamente esse tipo =IO=?
-Parece um pouco como mágica.
+Por que usamos essa sintaxe estranha e o que é exatamente esse tipo =IO=? Parece
+um pouco como mágica.
 
 Por enquanto vamos esquecer todas as partes puras do nosso sistema e focar na
 parte impura:
@@ -2198,7 +2198,7 @@ Haskell, para avaliar =f a b= você tem diversas opções:
 - primeiro avaliar =b=, depois =a=, depois =f a b=
 - avaliar =a= e =b= em paralelo e depois =f a b=
 
-Isso é verdadeiro porque nós estamos trabalho na parte pura da linguagem.
+Isso é verdadeiro porque estamos trabalho na parte pura da linguagem.
 
 Agora, se você olhar para a função principal =main= fica claro que você precisa
 avaliar a primeira linha antes da segunda porque para avaliar a segunda linha
@@ -2287,8 +2287,8 @@ let (_,w3) = action3 z w2 in
 [[file:images/_20210727_122926screenshot.png]]
 
 
-Agora vamos fazer um truque de mágica! Nós vamos os simbolos temporarios dos
-mundos externos =w?= "desaparecerem". Nós vamos usar =bind= nas duas linhas.
+Agora vamos fazer um truque de mágica! Vimos os simbolos temporarios dos mundos
+externos =w?= "desaparecerem". Agora vamos usar =bind= nas duas linhas.
 
 Vamos definir a função =bind=, note que o seu tipo pode ser bem intimidador de
 inicio:
@@ -2375,9 +2375,9 @@ Agora, usando a função =bind=
 (res, w2) = (bind getLine print) w0
 #+end_src
 
-Como o =print= é do tipo =Show a => a -> (World, ((), World))=, nós sabemos que
-=res = ()= (tipo =unit=). Se você não conseguiu ver a mágica aqui, vamos tentar
-com essas três linhas agora:
+Como o =print= é do tipo =Show a => a -> (World, ((), World))=, sabemos que =res
+= ()= (tipo =unit=). Se você não conseguiu ver a mágica aqui, vamos tentar com
+essas três linhas agora:
 
 #+begin_src haskell
 let (line1, w1) = getLine w0 in
@@ -2397,7 +2397,7 @@ Que é equivalente a:
 Não reparou em algo? Nenhuma variável do mundo externo é usada em lugar algum.
 Isso é má-gi-ca!
 
-Nós podemos utilizar uma notação melhor. Vamos usar =>>== no lugar de =bind=. A
+Podemos utilizar uma notação melhor. Vamos usar =>>== no lugar de =bind=. A
 função =>>== é uma função infixa igual ao =(+)= ou seja =3 + 4 <-> (+) 3 4=
 
 #+begin_src haskell
@@ -2437,8 +2437,8 @@ blindBind action1 action2 w0 =
   bind action1 (\_ -> action2) w0
 #+end_src
 
-Eu não simplifiquei essa definição para deixá-la mais clara, porém nós podiamos
-ter usado uma notação melhor: =>>=
+Eu não simplifiquei essa definição para deixá-la mais clara, porém podiamos ter
+usado uma notação melhor: =>>=
 
 e
 
@@ -2689,9 +2689,9 @@ instance Monad Maybe where
   return x = Just x
 #+end_src
 
-A monad =Maybe= se mostrou util mesmo dentro desse exemplo simples. Nós também
-vimos a utilidade da monad =IO=, mas agora vamos olhar um exemplo mais
-interessante, listas.
+A monad =Maybe= se mostrou util mesmo dentro desse exemplo simples. Também vimos
+a utilidade da monad =IO=, mas agora vamos olhar um exemplo mais interessante,
+listas.
 
 ** A lista monad
 
@@ -2742,14 +2742,14 @@ alguns detalhes.
 
 ** Mais sobre Arvore Infinita
 
-Na seção sobre Estruturas Infinitas nós vimos alguns construtores simples. Mas
-infelizmente, nós removemos duas propriedades das nossas arvores:
+Na seção sobre Estruturas Infinitas vimos alguns construtores simples. Mas
+infelizmente, removemos duas propriedades das nossas arvores:
 
 1. valores de nós duplicados
 2. arvores bem ordenadas
 
-Nessa seção nós vamos tentar manter a primeira propriedade. Com relação a
-segunda propriedade nós vamos deixar um pouco de lado, porém sempre que possível
+Nessa seção vamos tentar manter a primeira propriedade. Com relação a
+segunda propriedade vamos deixar um pouco de lado, porém sempre que possível
 vamos tentar mantê-la em mente.
 
 Noss primeiro passo é criar uma lista de números pseudo-aleatórios.
@@ -2838,12 +2838,12 @@ Deixado como exercício para o leitor:
 
 -------
 
-Para conseguir responder essas perguntas, nós vamos modificar as funções
+Para conseguir responder essas perguntas, vamos modificar as funções
 =treeFromList= e =shuffle=.
 
 O primeiro problema é a falta de infinitos números diferentes na nossa
-implementação de =shuffle=, nós geramos apenas =4331= números diferentes. Para
-resolver isso nós temos que melhorar um pouco a implementação de =shuffle=.
+implementação de =shuffle=, geramos apenas =4331= números diferentes. Para
+resolver isso temos que melhorar um pouco a implementação de =shuffle=.
 
 #+begin_src haskell
 shuffle = map rand [1..]
@@ -2874,7 +2874,7 @@ inferiores (superior) do que o valor na raiz.
 Observe que isso vai fazer com que a arvore seja *quase* uma arvore binaria
 ordenada. Além disso, por construção, cada valor no nó é único dentro da arvore.
 
-Segue a nossa nova versão de =treeFromList= onde nós simplesmente trocamos
+Segue a nossa nova versão de =treeFromList= onde simplesmente trocamos
 =filter= por =safefilter=.
 
 #+begin_src haskell
