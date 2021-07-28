@@ -680,12 +680,13 @@ A parte difícil começa agora.
 
 [[file:images/_20210725_195209screenshot.png]]
 
-Nessa seção, eu vou dar um pequeno exemplo do poder impressionante de
-refatoração de código que o Haskell provê. Nós vamos selecionar um problema e
-resolvê-lo utilizando um estilo imperativo convencional, depois eu vou evoluir o
-código até chegarmos na versão funcional.
+Nessa seção, vou dar um pequeno exemplo do impressionante poder de refatoração
+de código que o Haskell possibilita. Camos selecionar um problema e resolvê-lo
+utilizando um estilo imperativo convencional e depois evoluir o código até
+chegarmos na versão funcional.
 
-A versão final vai ser ao mesmo tempo mais elegante e mais fácil de se adaptar.
+A versão final vai ser ao mesmo tempo mais elegante e mais fácil de adaptar para
+novos requisitos futuro.
 
 Vamos resolver o seguinte problema:
 
@@ -694,8 +695,7 @@ Dada uma lista de inteiros, retorne a soma dos números pares dessa lista.
 Exemplo: =[1,2,3,4,5] ⇒ 2 + 4 ⇒ 6
 #+end_quote
 
-
-Para demonstrar as diferenças entre os estilos imperativo e funcional, eu vou
+Para demonstrar as diferenças entre os estilos imperativo e funcional, vamos
 iniciar com uma implementação imperativa em JavaScript:
 
 #+begin_src javascript
@@ -710,19 +710,19 @@ function evenSum(list) {
 }
 #+end_src
 
-Em Haskell, por outro lado, nós não temos variáveis ou um =for loop=. Uma
-solução para alcançar o mesmo resultado sem utilizar =loops= é através da
-recursão.
+Em Haskell, por outro lado, não temos variáveis ou um =for loop=. Uma forma de
+atingir o mesmo resultado sem utilizar =loops= é através da recursão.
 
 #+begin_quote
-Observação: Recursão é geralmente entendida como algo *lento* em linguagens
-imperativas, porém geralmente isso não é verdade em linguagens functionais. A
-maioria das vezes o Haskell vai tratar a recursão de funções de forma eficiente.
+Observação: Recursão é geralmente entendida como uma opção *lenta* em linguagens
+imperativas, porém geralmente isso não é verdade em linguagens functionais. Na
+maioria das vezes o Haskell vai tratar a recursão de funções de forma bem
+eficiente.
 #+end_quote
 
 Aqui temos uma versão em C utilizando funções recursivas. Note que para
-simplificar, eu assumi que a lista de inteiros vai acabar quando encontrar o
-primeiro valor 0 dentro da lista.
+simplificar, eu assumi que a recursão vai terminar quando encontrar o primeiro
+valor 0 dentro da lista.
 
 #+begin_src c
 int evenSum(int *list) {
@@ -746,10 +746,9 @@ int accumSum(int n, int *list) {
 }
 #+end_src
 
-
-Mantenha esse código na cabeça. Nós vamos traduzi-lo para Haskell. Primeiro,
-entretanto, eu preciso introduzir três funcões simples mas muito uteis que nós
-vamos usar:
+Mantenha esse código na cabeça pois vamos traduzi-lo para Haskell. Primeiro,
+entretanto, preciso introduzir três funcões simples mas muito uteis que vamos
+utilizar:
 
 #+begin_src haskell
 even :: Integral a => a -> Bool
@@ -783,8 +782,9 @@ Note que para qualquer lista não vazia, =l ⇔ (head l):(tail l)=
 
 -------
 
-A primeira solução para o problema proposto em Haskell. A função =evenSum=
-retorna a soma de todos os números pares em uma lista:
+A primeira solução para o problema proposto em Haskell.
+
+A função =evenSum= retorna a soma de todos os números pares em uma lista:
 
 #+begin_src haskell
 -- Version 1
@@ -836,8 +836,10 @@ l == []
 #+end_src
 
 Mesmo vindo de uma experiência com linguagens imperativas tudo deve parecer
-tranquilo. De fato, muitas coisas podem ser melhoradas nessa primeira
-implementação. Primeiro, podemos generalizar os tipos.
+tranquilo para você até aqui. De fato, muitas coisas podem ser melhoradas nessa
+primeira implementação.
+
+Primeiro, podemos generalizar os tipos.
 
 #+begin_src haskell
 evenSum :: Integral a => [a] -> a
@@ -846,8 +848,8 @@ evenSum :: Integral a => [a] -> a
 
 -------
 
-Depois, nós podemos utilizar a função =where= ou =let= e assim a função
-=accumSum= não precisa poluir o nosso modulo.
+Depois, podemos utilizar a função =where= ou =let= e assim a função =accumSum=
+não precisa existir e poluir o nosso modulo.
 
 #+begin_src haskell
 -- Versao 2
@@ -863,7 +865,7 @@ evenSum l = accumSum 0 l
                       else accumSum n xs
 #+end_src
 
-Depois, nós podemos utilizar =pattern matching=.
+Depois, vamos utilizar =pattern matching=.
 
 #+begin_src haskell
 -- Versao 3
@@ -876,7 +878,7 @@ evenSum l = accumSum 0 l
       else accumSum n xs
 #+end_src
 
-O que é =pattern matching=? Nós estamos usando *valores* no lugar dos nomes dos
+O que é =pattern matching=? Estamos usando *valores* no lugar dos nomes dos
 parâmetros para fazer escolha do =branch= de execução.
 
 No lugar de falar: =foo l = if l == [] then <x> else <y>=, você pode
@@ -911,19 +913,19 @@ fácil de ler.
 
 ------
 
-Em Haskell você pode simplificar a definição de uma função através da técnica de
+Em Haskell podemos simplificar a definição de uma função através da técnica de
 =η-redução=. Por exemplo, no lugar de escrever:
 
 #+begin_src haskell
 f x = (alguma expressao) x
 #+end_src
 
-Você pode simplesmente escrever
+escrevemos apenas
 #+begin_src haskell
 f = alguma expressao
 #+end_src
 
-Usando esse método, nós podemos remover o =l= da implementação 3.
+Usando esse método, podemos remover o =l= da implementação 3.
 #+begin_src haskell
 -- versao 4
 evenSum :: Integral a => [a] -> a
@@ -940,7 +942,7 @@ evenSum = accumSum 0
 
 [[file:images/_20210725_195232screenshot.png]]
 
-Para fazer as coisas ainda melhores, nós devemos utilizar funções de ordens
+Para deixar as coisas ainda melhores, devemos utilizar funções de ordens
 elevadas. O que são esses monstros? Funções de ordem elevadas são funções que
 recebem outras funções como parâmetros.
 
@@ -950,7 +952,6 @@ filter :: (a -> Bool) -> [a] -> [a]
 map :: (a -> b) -> [a] -> [b]
 foldl :: (a -> b -> a) -> a -> [b] -> a
 #+end_src
-
 
 Vamos prosseguir em passos pequenos.
 
@@ -971,8 +972,8 @@ A função =filter= recebe uma função do tipo =(a -> Bool)= e uma lista do tip
 =[a]= e retorna uma lista contendo somente elementos em que a função informada
 retornou =true=.
 
-Nosso próximo passo é utilizar uma outra técnica para realizar a mesma coisa que
-o =loop=. Nós vamos utilizar a função =foldl= para acumular os valores enquanto
+Nosso próximo passo é utilizar uma outra técnica para executar a mesma coisa que
+o =loop=. Vamos utilizar a função =foldl= para acumular os valores enquanto
 atravessamos a lista. A função =foldl= captura esse padrão geral de código:
 
 #+begin_src haskell
@@ -1015,8 +1016,8 @@ evenSum l = foldl' mysum 0 (filter even l)
   where mysum acc value = acc + value
 #+end_src
 
-Nós podemos simplificar essa Implementação utilizando a notação lambda. Dessa
-forma, não precisamos criar um nome temporário =mysum=
+Podemos simplificar essa Implementação utilizando a notação lambda. Dessa forma,
+não precisamos criar um nome temporário =mysum=
 
 #+begin_src haskell
 -- versao 7
@@ -1040,7 +1041,7 @@ evenSum l = foldl' (+) 0 (filter even l)
 #+end_src
 
 =foldl'= não é uma função fácil de entender. Se você não está acostumado com
-ela, você deveria estudá-la um pouco. Para ajudar o entendimento do que está
+ela, deveria estudá-la um pouco. Para ajudar o entendimento do que está
 acontecendo dentro da função, segue um passo a passo do fluxo de execução:
 
 #+begin_src haskell
@@ -1061,7 +1062,7 @@ composição matemática.
 (f . g . h) x ⇔ f (g (h x))
 #+end_src
 
-Nós podemos utilizar a composição para reduzir a nossa função =evenSum=
+Podemos utilizar a composição para reduzir a nossa função =evenSum=
 
 #+begin_src haskell
 -- versao 9
@@ -1070,7 +1071,7 @@ evenSum :: Integral a => [a] -> a
 evenSum = (foldl' (+) 0) . (filter even)
 #+end_src
 
-Além disso, nós podemos até renomear cada uma das partes para tornar ainda mais
+Além disso, podemos até renomear cada uma das partes para tornar ainda mais
 claro:
 
 #+begin_src haskell
@@ -1102,29 +1103,30 @@ squareEvenSum = sum' . (filter even) . (map (^2))
 squareEvenSum' = evenSum . (map (^2))
 #+end_src
 
-Nós só tivemos que adicionar uma "função de transformação" adicional.
+Só tivemos que adicionar uma "função de transformação" adicional.
 
 A função =map= apenas aplica uma função em todos os elementos de uma lista.
 
-Nós não tivemos que modificar nada *dentro* da definição da função original, ou
+Não tivemos que modificar nada *dentro* da definição da função original, ou
 seja, esse comportamento faz com que nosso código seja mais modular. Mas além
 disso, você pode pensar de forma mais matemática sobre suas funções. Você pode
-tratar essa nova função como se fosse uma função builtin, ou seja, você pode
+tratar essa nova função como se fosse uma função nativa, ou seja, pode
 utilizá-la junto com map, fold, filter, etc.
 
 Modificar a versão 1 para o novo requisito é deixado como exercício para o
 leitor ☺.
 
-Se você acha que chegamos no final da *generalização*, então você está muito
-errado! Por exemplo, existe uma forma de utilizar essa função não apenas em
-listas mas em qualquer estrutura de dados de tipo recursivo. Se você quer saber
-como, eu sugiro a leitura desse artigo bem divertido: [[http://eprints.eemcs.utwente.nl/7281/01/db-utwente-40501F46.pdf][Functional Programming
-with Bananas, Lenses, Envelopes and Barbed Wire by Meijer, Fokkinga and Paterson]].
+Se você acha que chegamos no final da *generalização*, então saiba que está
+muito enganado! Por exemplo, existe uma forma de utilizar essa função não apenas
+em listas mas em qualquer estrutura de dados de tipo recursivo. Se você quer
+saber como, eu sugiro a leitura desse artigo bem divertido: [[http://eprints.eemcs.utwente.nl/7281/01/db-utwente-40501F46.pdf][Functional
+Programming with Bananas, Lenses, Envelopes and Barbed Wire by Meijer, Fokkinga
+and Paterson]].
 
-Esse exemplo deveria ter te mostrado o quão interessante programação puramente
-funcional pode ser, porém infelizmente, usar programação puramente funcional não
-é aconselhável para todos os casos de uso. Ou pelo menos nenhuma linguagem que
-atenda esse requisito foi encontrada ainda.
+Esse exemplo mostrou o quão interessante programação puramente funcional pode
+ser, porém infelizmente, usar programação puramente funcional não é aconselhável
+para todos os casos de uso. Ou pelo menos nenhuma linguagem que atenda esse
+requisito foi encontrada ainda.
 
 Um dos super poderes do Haskell é a habilidade de criar DSLs (Domain Specific
 Language) sendo bem fácil de trocar o paradigma de programação. De fato, Haskell
